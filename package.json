@@ -1,0 +1,21 @@
+{
+  "name": "coding-test-server",
+  "version": "1.0.0",
+  "description": "Auto-grading server for coding assessments",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "clear-db": "node scripts/clear-database.js",
+    "db-status": "node scripts/database-status.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "lowdb": "^1.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
