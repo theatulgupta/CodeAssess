@@ -3,20 +3,101 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const path = require("path");
 const rateLimit = require("express-rate-limit");
-const db = require("./database"); // Using our new SQLite database module
+const cluster = require("cluster");
+const os = require("os");
+const db = require("./database");
 
 const app = express();
 
-// --- Security Middleware ---
+// Cluster setup for load handling
+if (cluster.isMaster && process.env.NODE_ENV === 'production') {
+  const numCPUs = os.cpus().length;
+  console.log(`🚀 Master process starting ${numCPUs} workers...`);
+  
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died. Restarting...`);
+    cluster.fork();
+  });
+  
+  return;
+}
+
+// --- High-Load Optimized Middleware ---
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Increased limit for a class of 40
-  message: "Too many requests from this IP, please try again after 15 minutes",
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 1000, // Increased for exam load
+  message: "Too many requests, please wait",
+  standardHeaders: false,
+  legacyHeaders: false,
+  skip: (req) => req.url === '/api/submit', // Don't limit submissions
 });
 
+// Submission-specific rate limiter
+const submissionLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 3, // Max 3 submissions per minute per IP
+  message: { error: "Too many submission attempts" },
+  standardHeaders: false,
+  legacyHeaders: false,
+});
+
+
 app.use(limiter);
-app.use(express.static("."));
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+
+// Performance optimizations
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+// Connection pooling and keep-alive
+app.use((req, res, next) => {
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Keep-Alive', 'timeout=5, max=1000');
+  next();
+});
+
+// Admin authentication middleware
+function adminAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
+    return res.status(401).send('Authentication required');
+  }
+  
+  const credentials = Buffer.from(auth.slice(6), 'base64').toString();
+  const [username, password] = credentials.split(':');
+  
+  if (username === 'atul@admin' && password === 'admin123') {
+    next();
+  } else {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
+    res.status(401).send('Invalid credentials');
+  }
+}
+
+// Serve admin.html with authentication
+app.get('/admin.html', adminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// Serve other static files normally
+app.use(express.static('.', {
+  index: false,
+  setHeaders: (res, path) => {
+    if (path.endsWith('admin.html')) {
+      res.status(404).end();
+    }
+  }
+}));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // MCQ Correct Answers
 const mcqAnswers = {
@@ -71,11 +152,12 @@ const STUDENT_DATABASE = {
   "25MCSS15": "GOURAV CHOUHAN",
 };
 
-// CORS for local development
+// Optimized CORS
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Methods", "GET, POST, DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Cache-Control", "no-cache, no-store, must-revalidate");
   next();
 });
 
@@ -91,36 +173,68 @@ try {
 // --- Test Cases ---
 const testCases = {
   1: [
-    // Q1: avgSecondMinMax - Second Minimum + Second Maximum Average
-    { input: [1, 2, 3, 4, 5], expected: "3", points: 10 }, // 2nd min=2, 2nd max=4, avg=3
-    { input: [10, 5, 20, 15, 25], expected: "15", points: 15 }, // 2nd min=10, 2nd max=20, avg=15
+    // Q1: Count Elements Greater Than All Previous
+    { input: [7, 4, 8, 2, 9], expected: "3", points: 7 },
+    { input: [1, 2, 3, 4, 5], expected: "5", points: 7 },
+    { input: [5, 4, 3, 2, 1], expected: "1", points: 6 },
+    { input: [10, 10, 10, 10], expected: "1", points: 7 },
+    { input: [3, 1, 4, 2, 5, 9, 7], expected: "4", points: 6 },
   ],
   2: [
-    // Q2: countEvenOdd - Count Even and Odd numbers
-    { input: [1, 2, 3, 4, 5], expected: "2 3", points: 10 }, // Even=2, Odd=3
-    { input: [2, 4, 6, 8], expected: "4 0", points: 15 }, // Even=4, Odd=0
+    // Q2: Row with Maximum 1's
+    { input: [[0,1,0],[1,1,0],[1,1,1]], expected: "3", points: 7 },
+    { input: [[0,0,0],[0,0,0],[0,0,0]], expected: "1", points: 7 },
+    { input: [[1,0],[1,1],[0,1]], expected: "2", points: 6 },
+    { input: [[1,1,1],[1,0,0],[0,1,0]], expected: "1", points: 7 },
+    { input: [[0,1],[0,1],[1,1]], expected: "3", points: 6 },
   ],
   3: [
-    // Q3: reverseArray - Reverse all elements
-    { input: [1, 2, 3, 4, 5], expected: "5 4 3 2 1", points: 10 },
-    { input: [10, 20, 30], expected: "30 20 10", points: 15 },
-  ],
-  4: [
-    // Q4: calculator - Mini Calculator
-    { input: { a: 10, b: 5, op: "+" }, expected: "15", points: 10 },
-    { input: { a: 20, b: 4, op: "*" }, expected: "80", points: 15 },
+    // Q3: Move Zeros to End
+    { input: [4,5,0,1,9,0,5,0], expected: "4 5 1 9 5 0 0 0", points: 7 },
+    { input: [0,0,0,0], expected: "0 0 0 0", points: 7 },
+    { input: [1,2,3,4], expected: "1 2 3 4", points: 7 },
+    { input: [0,1,0,2,0,3,0,4], expected: "1 2 3 4 0 0 0 0", points: 6 },
+    { input: [5], expected: "5", points: 7 },
   ],
 };
 
-// --- Auto-Grading Logic ---
+// --- Optimized Auto-Grading with Queue ---
+const gradingQueue = [];
+const MAX_CONCURRENT_GRADING = 5;
+let activeGrading = 0;
+
+function processGradingQueue() {
+  if (gradingQueue.length === 0 || activeGrading >= MAX_CONCURRENT_GRADING) {
+    return;
+  }
+  
+  const { resolve, reject, studentName, answers } = gradingQueue.shift();
+  activeGrading++;
+  
+  autoGradeInternal(studentName, answers)
+    .then(resolve)
+    .catch(reject)
+    .finally(() => {
+      activeGrading--;
+      setImmediate(processGradingQueue);
+    });
+}
+
 function autoGrade(studentName, answers) {
+  return new Promise((resolve, reject) => {
+    gradingQueue.push({ resolve, reject, studentName, answers });
+    processGradingQueue();
+  });
+}
+
+function autoGradeInternal(studentName, answers) {
   return new Promise((resolve, reject) => {
     let totalScore = 0;
     let maxScore = 0;
     let results = {};
 
     const questions = Object.keys(answers).filter(
-      (q) => answers[q] && answers[q].trim()
+      (q) => answers[q] && answers[q].trim() && parseInt(q) <= 3
     );
 
     if (questions.length === 0) {
@@ -137,6 +251,11 @@ function autoGrade(studentName, answers) {
     questions.forEach((qNum) => {
       const tests = testCases[qNum];
       if (!tests) {
+        results[qNum] = {
+          score: 0,
+          error: "No test cases available for this question",
+          tests: [],
+        };
         completed++;
         if (completed === questions.length) {
           resolve({ totalScore, maxScore: 100, results });
@@ -144,33 +263,30 @@ function autoGrade(studentName, answers) {
         return;
       }
 
-      maxScore += tests.reduce((sum, test) => sum + test.points, 0);
+      const questionMaxScore = tests.reduce((sum, test) => sum + test.points, 0);
+      maxScore += questionMaxScore;
 
       try {
         const fullCode = createFullCode(qNum, answers[qNum]);
-        const fileName = `temp_${studentName.replace(
-          /[^a-zA-Z0-9]/g,
-          "_"
-        )}_${Date.now()}_q${qNum}.cpp`;
-        const exeName = path.join(
-          submissionDir,
-          `temp_${studentName.replace(
-            /[^a-zA-Z0-9]/g,
-            "_"
-          )}_${Date.now()}_q${qNum}`
-        );
+        const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const fileName = path.join(submissionDir, `temp_${uniqueId}_q${qNum}.cpp`);
+        const exeName = path.join(submissionDir, `temp_${uniqueId}_q${qNum}`);
 
         fs.writeFileSync(fileName, fullCode);
 
-        const compileCmd = `g++ -std=c++11 -o ${exeName} ${fileName}`;
-        exec(compileCmd, { timeout: 10000 }, (error, stdout, stderr) => {
+        const compileCmd = `g++ -std=c++17 -O2 -Wall -Wextra -o "${exeName}" "${fileName}"`;
+        exec(compileCmd, { 
+          timeout: 10000, // Reduced timeout
+          maxBuffer: 512 * 1024, // Reduced buffer
+          killSignal: 'SIGKILL'
+        }, (error, stdout, stderr) => {
           if (error) {
             results[qNum] = {
               score: 0,
               error: `Compilation Error: ${stderr || error.message}`,
               tests: [],
             };
-            cleanupFiles([fileName, exeName]);
+            cleanupFiles([fileName, exeName, exeName + '.exe']);
             completed++;
             if (completed === questions.length) {
               resolve({
@@ -180,8 +296,13 @@ function autoGrade(studentName, answers) {
               });
             }
           } else {
-            const runCmd = `./${exeName}`;
-            exec(runCmd, { timeout: 5000 }, (runError, stdout, stderr) => {
+            const runCmd = process.platform === 'win32' ? `"${exeName}.exe"` : `"${exeName}"`;
+            exec(runCmd, { 
+              timeout: 5000, // Reduced timeout
+              maxBuffer: 256 * 1024, // Reduced buffer
+              cwd: __dirname,
+              killSignal: 'SIGKILL'
+            }, (runError, stdout, stderr) => {
               if (runError) {
                 results[qNum] = {
                   score: 0,
@@ -193,7 +314,7 @@ function autoGrade(studentName, answers) {
                 results[qNum] = score;
                 totalScore += score.score;
               }
-              cleanupFiles([fileName, exeName]);
+              cleanupFiles([fileName, exeName, exeName + '.exe']);
               completed++;
               if (completed === questions.length) {
                 resolve({
@@ -278,74 +399,113 @@ function createFullCode(qNum, studentCode) {
   };
 
   const functionNames = {
-    1: "avgSecondMinMax",
-    2: "countEvenOdd",
-    3: "reverseArray",
-    4: "calculator",
+    1: "countGreaterThanPrior",
+    2: "rowWithMaxOnes",
+    3: "moveZerosToEnd",
   };
 
   const defaultImplementations = {
-    1: `int avgSecondMinMax(int arr[], int n) {
+    1: `int countGreaterThanPrior(const vector<int>& arr) {
     return 0; // Default implementation
 }`,
-    2: `pair<int,int> countEvenOdd(int arr[], int n) {
-    return make_pair(0, 0); // Default implementation
+    2: `int rowWithMaxOnes(const vector<vector<int>>& matrix) {
+    return 0; // Default implementation
 }`,
-    3: `void reverseArray(int arr[], int n) {
+    3: `void moveZerosToEnd(vector<int>& arr) {
     // Default implementation - do nothing
-}`,
-    4: `int calculator(int a, int b, char op) {
-    return -1; // Default implementation
 }`,
   };
 
   const headers = {
     1: `#include <iostream>
-#include <algorithm>
+#include <vector>
 using namespace std;`,
     2: `#include <iostream>
-#include <utility>
+#include <vector>
 using namespace std;`,
     3: `#include <iostream>
-using namespace std;`,
-    4: `#include <iostream>
+#include <vector>
 using namespace std;`,
   };
 
   const mainFunctions = {
     1: `int main() {
-    int arr1[] = {1,2,3,4,5};
-    cout << avgSecondMinMax(arr1, 5) << endl;
+    vector<int> arr1 = {7,4,8,2,9};
+    cout << countGreaterThanPrior(arr1) << endl;
     
-    int arr2[] = {10,5,20,15,25};
-    cout << avgSecondMinMax(arr2, 5) << endl;
+    vector<int> arr2 = {1,2,3,4,5};
+    cout << countGreaterThanPrior(arr2) << endl;
+    
+    vector<int> arr3 = {5,4,3,2,1};
+    cout << countGreaterThanPrior(arr3) << endl;
+    
+    vector<int> arr4 = {10,10,10,10};
+    cout << countGreaterThanPrior(arr4) << endl;
+    
+    vector<int> arr5 = {3,1,4,2,5,9,7};
+    cout << countGreaterThanPrior(arr5) << endl;
+    
     return 0;
 }`,
     2: `int main() {
-    int arr1[] = {1,2,3,4,5};
-    auto ans1 = countEvenOdd(arr1, 5);
-    cout << ans1.first << " " << ans1.second << endl;
+    vector<vector<int>> matrix1 = {{0,1,0},{1,1,0},{1,1,1}};
+    cout << rowWithMaxOnes(matrix1) << endl;
     
-    int arr2[] = {2,4,6,8};
-    auto ans2 = countEvenOdd(arr2, 4);
-    cout << ans2.first << " " << ans2.second << endl;
+    vector<vector<int>> matrix2 = {{0,0,0},{0,0,0},{0,0,0}};
+    cout << rowWithMaxOnes(matrix2) << endl;
+    
+    vector<vector<int>> matrix3 = {{1,0},{1,1},{0,1}};
+    cout << rowWithMaxOnes(matrix3) << endl;
+    
+    vector<vector<int>> matrix4 = {{1,1,1},{1,0,0},{0,1,0}};
+    cout << rowWithMaxOnes(matrix4) << endl;
+    
+    vector<vector<int>> matrix5 = {{0,1},{0,1},{1,1}};
+    cout << rowWithMaxOnes(matrix5) << endl;
+    
     return 0;
 }`,
     3: `int main() {
-    int arr1[] = {1,2,3,4,5};
-    reverseArray(arr1, 5);
-    for(int i = 0; i < 5; i++) cout << arr1[i] << " ";
+    vector<int> arr1 = {4,5,0,1,9,0,5,0};
+    moveZerosToEnd(arr1);
+    for(int i = 0; i < arr1.size(); i++) {
+        cout << arr1[i];
+        if(i < arr1.size()-1) cout << " ";
+    }
     cout << endl;
     
-    int arr2[] = {10,20,30};
-    reverseArray(arr2, 3);
-    for(int i = 0; i < 3; i++) cout << arr2[i] << " ";
+    vector<int> arr2 = {0,0,0,0};
+    moveZerosToEnd(arr2);
+    for(int i = 0; i < arr2.size(); i++) {
+        cout << arr2[i];
+        if(i < arr2.size()-1) cout << " ";
+    }
     cout << endl;
-    return 0;
-}`,
-    4: `int main() {
-    cout << calculator(10, 5, '+') << endl;
-    cout << calculator(20, 4, '*') << endl;
+    
+    vector<int> arr3 = {1,2,3,4};
+    moveZerosToEnd(arr3);
+    for(int i = 0; i < arr3.size(); i++) {
+        cout << arr3[i];
+        if(i < arr3.size()-1) cout << " ";
+    }
+    cout << endl;
+    
+    vector<int> arr4 = {0,1,0,2,0,3,0,4};
+    moveZerosToEnd(arr4);
+    for(int i = 0; i < arr4.size(); i++) {
+        cout << arr4[i];
+        if(i < arr4.size()-1) cout << " ";
+    }
+    cout << endl;
+    
+    vector<int> arr5 = {5};
+    moveZerosToEnd(arr5);
+    for(int i = 0; i < arr5.size(); i++) {
+        cout << arr5[i];
+        if(i < arr5.size()-1) cout << " ";
+    }
+    cout << endl;
+    
     return 0;
 }`,
   };
@@ -387,74 +547,104 @@ function evaluateOutput(qNum, stdout, tests) {
   return { score, tests: testResults };
 }
 
-// --- API Endpoints ---
-app.post("/api/submit", async (req, res) => {
-  const { name, rollNumber, answers, mcqAnswers: studentMCQAnswers } = req.body;
+// --- Optimized API Endpoints ---
+app.post("/api/submit", submissionLimiter, async (req, res) => {
+  const startTime = Date.now();
+  const { name, rollNumber, answers, mcqAnswers: studentMCQAnswers, tabSwitchCount } = req.body;
 
-  // Detailed validation
   if (!name || name.trim() === "") {
     return res.status(400).json({
       error: "Missing student name",
       details: "Student name is required for submission",
-      received: { name, rollNumber },
     });
   }
 
-  if (!answers && !studentMCQAnswers) {
-    return res.status(400).json({
-      error: "No answers provided",
-      details: "Either coding answers or MCQ answers must be provided",
-      received: { hasAnswers: !!answers, hasMCQAnswers: !!studentMCQAnswers },
-    });
-  }
-
-  // Validate rollNumber format if provided
-  if (rollNumber && !rollNumber.match(/^25MCS[AS]\d{2}$/)) {
+  if (!rollNumber || !rollNumber.match(/^25MCS[AS]\d{2}$/)) {
     return res.status(400).json({
       error: "Invalid roll number format",
       details: "Roll number must be in format 25MCSXXX",
-      received: { rollNumber },
     });
   }
 
   try {
-    // Grade coding questions
+    // Check for duplicate submission
+    const existingResults = await db.getResults();
+    const duplicate = existingResults.find(r => r.rollNumber === rollNumber);
+    if (duplicate) {
+      return res.status(409).json({
+        error: "Duplicate submission",
+        details: "This student has already submitted",
+        existing: duplicate
+      });
+    }
+
+    // Grade coding questions with optimized timeout
     const codingResult = answers
-      ? await autoGrade(name, answers)
+      ? await Promise.race([
+          autoGrade(name, answers),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Server busy, please retry')), 30000)
+          )
+        ])
       : {
           totalScore: 0,
-          maxScore: 0,
+          maxScore: 100,
           results: {},
         };
 
-    // Grade MCQ questions
     const mcqResult = gradeMCQ(studentMCQAnswers);
 
-    // Combine results
     const finalResult = {
       name,
       rollNumber,
-      totalScore: codingResult.totalScore + mcqResult.mcqScore,
-      maxScore: Math.max(codingResult.maxScore, 75) + mcqResult.mcqMaxScore, // 75 for coding + 25 for MCQ
+      totalScore: codingResult.totalScore,
+      maxScore: codingResult.maxScore,
       codingScore: codingResult.totalScore,
-      codingMaxScore: Math.max(codingResult.maxScore, 75),
-      mcqScore: mcqResult.mcqScore,
-      mcqMaxScore: mcqResult.mcqMaxScore,
+      codingMaxScore: codingResult.maxScore,
+      mcqScore: 0,
+      mcqMaxScore: 0,
       results: codingResult.results,
-      mcqResults: mcqResult.mcqResults,
+      mcqResults: {},
+      submittedCode: answers || {},
+      tabSwitchCount: tabSwitchCount || 0,
       timestamp: new Date().toISOString(),
     };
 
     const savedResult = await db.saveResult(finalResult);
-    res.status(201).json(savedResult);
+    
+    // Log performance metrics
+    const processingTime = Date.now() - startTime;
+    console.log(`✅ Submission processed: ${rollNumber} in ${processingTime}ms`);
+    
+    res.status(201).json({
+      ...savedResult,
+      processingTime
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to process submission", details: error.message });
+    const processingTime = Date.now() - startTime;
+    console.error(`❌ Submission failed: ${req.body.rollNumber} in ${processingTime}ms -`, error.message);
+    
+    if (error.message.includes('timeout') || error.message.includes('busy')) {
+      res.status(503).json({ 
+        error: "Server busy", 
+        details: "High load detected. Please wait 10 seconds and try again.",
+        retryAfter: 10
+      });
+    } else if (error.message.includes('Duplicate')) {
+      res.status(409).json({ 
+        error: "Already submitted", 
+        details: error.message
+      });
+    } else {
+      res.status(500).json({ 
+        error: "Processing failed", 
+        details: "Please try again in a moment"
+      });
+    }
   }
 });
 
-app.get("/api/results", async (req, res) => {
+app.get("/api/results", adminAuth, async (req, res) => {
   try {
     const results = await db.getResults();
     res.json(results);
@@ -465,8 +655,61 @@ app.get("/api/results", async (req, res) => {
   }
 });
 
+// Check if student already submitted
+app.post("/api/check-submission", async (req, res) => {
+  const { rollNumber } = req.body;
+  
+  if (!rollNumber) {
+    return res.status(400).json({ error: "Roll number is required" });
+  }
+  
+  try {
+    const results = await db.getResults();
+    const existingSubmission = results.find(r => r.rollNumber === rollNumber);
+    
+    if (existingSubmission) {
+      res.json({
+        alreadySubmitted: true,
+        submission: existingSubmission
+      });
+    } else {
+      res.json({
+        alreadySubmitted: false
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to check submission status" });
+  }
+});
+
+// Optimized test code endpoint
+app.post("/api/test-code", rateLimit({
+  windowMs: 60 * 1000,
+  max: 10, // Limit test runs
+  message: { error: "Too many test runs" }
+}), async (req, res) => {
+  const { questionNumber, code, studentName } = req.body;
+  
+  if (!questionNumber || !code) {
+    return res.status(400).json({ error: "Missing question number or code" });
+  }
+  
+  try {
+    const result = await autoGrade(studentName || "test", { [questionNumber]: code });
+    const questionResult = result.results[questionNumber];
+    
+    if (questionResult) {
+      res.json(questionResult);
+    } else {
+      res.json({ error: "No test results available" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Admin endpoint to clear all results (use with caution!)
-app.delete("/api/results/clear", async (req, res) => {
+app.delete("/api/results/clear", adminAuth, async (req, res) => {
   try {
     const result = await db.clearResults();
     res.json({
@@ -482,7 +725,25 @@ app.delete("/api/results/clear", async (req, res) => {
   }
 });
 
-// --- Server Start ---
+// Admin endpoint to delete individual submission
+app.delete("/api/results/:id", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.deleteResult(id);
+    res.json({
+      success: true,
+      message: "Submission deleted successfully",
+      deletedId: id,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to delete submission", details: error.message });
+  }
+});
+
+// --- Optimized Server Start ---
 const PORT = process.env.PORT || 3000;
 
 // Verify database connection and start server
@@ -492,12 +753,30 @@ async function startServer() {
     await db.getResults();
     console.log("✅ Database connected successfully");
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Auto-Grading Server running on:`);
-      console.log(`   Local:    http://localhost:${PORT}`);
-      console.log(`   Network:  http://0.0.0.0:${PORT}`);
-      console.log(`   Status:   Ready for submissions`);
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      const workerId = cluster.worker ? cluster.worker.id : 'Master';
+      console.log(`🚀 Worker ${workerId} running on port ${PORT}`);
+      if (!cluster.worker) {
+        console.log(`   Local:    http://localhost:${PORT}`);
+        console.log(`   Network:  http://0.0.0.0:${PORT}`);
+        console.log(`   Status:   Ready for high-load submissions`);
+      }
     });
+    
+    // Optimize server settings for high load
+    server.keepAliveTimeout = 65000;
+    server.headersTimeout = 66000;
+    server.maxConnections = 1000;
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('🔄 Graceful shutdown initiated...');
+      server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+      });
+    });
+    
   } catch (error) {
     console.error("❌ Failed to connect to database:", error.message);
     process.exit(1);

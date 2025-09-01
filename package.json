@@ -1,8 +1,15 @@
 {
-  "name": "coding-test-server",
+  "name": "codeassess",
   "version": "1.0.0",
-  "description": "Auto-grading server for coding assessments",
+  "description": "Automated Coding Assessment Platform with real-time grading",
   "main": "server.js",
+  "keywords": ["coding", "assessment", "grading", "c++", "exam", "education"],
+  "author": "Atul Gupta <theatulgupta@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theatulgupta/CodeAssess.git"
+  },
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",

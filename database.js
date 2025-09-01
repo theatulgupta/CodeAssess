@@ -17,7 +17,7 @@ const createTable = () => {
     CREATE TABLE IF NOT EXISTS results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         studentName TEXT NOT NULL,
-        rollNumber TEXT,
+        rollNumber TEXT UNIQUE,
         totalScore INTEGER NOT NULL,
         maxScore INTEGER NOT NULL,
         codingScore INTEGER DEFAULT 0,
@@ -27,27 +27,41 @@ const createTable = () => {
         percentage REAL NOT NULL,
         results TEXT NOT NULL,
         mcqResults TEXT,
+        submittedCode TEXT,
+        tabSwitchCount INTEGER DEFAULT 0,
         timestamp TEXT NOT NULL
     );`;
+  
+  // Optimize database for high concurrency
+  db.run("PRAGMA journal_mode = WAL");
+  db.run("PRAGMA synchronous = NORMAL");
+  db.run("PRAGMA cache_size = 10000");
+  db.run("PRAGMA temp_store = memory");
+  
   db.run(createTableSql, (err) => {
     if (err) {
       console.error("Error creating table", err.message);
     } else {
-      console.log("Results table is ready.");
+      console.log("Results table optimized for high load.");
+      // Create index for faster lookups
+      db.run("CREATE INDEX IF NOT EXISTS idx_rollNumber ON results(rollNumber)", () => {});
+      db.run("CREATE INDEX IF NOT EXISTS idx_timestamp ON results(timestamp)", () => {});
+      db.run("ALTER TABLE results ADD COLUMN submittedCode TEXT", () => {});
+      db.run("ALTER TABLE results ADD COLUMN tabSwitchCount INTEGER DEFAULT 0", () => {});
     }
   });
 };
 
-// Function to save a new test result
+// Optimized save with connection pooling
 const saveResult = (result) => {
   return new Promise((resolve, reject) => {
     const insertSql = `
         INSERT INTO results (
           studentName, rollNumber, totalScore, maxScore, 
           codingScore, codingMaxScore, mcqScore, mcqMaxScore,
-          percentage, results, mcqResults, timestamp
+          percentage, results, mcqResults, submittedCode, tabSwitchCount, timestamp
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
     const params = [
       result.name,
@@ -61,41 +75,77 @@ const saveResult = (result) => {
       (result.totalScore / result.maxScore) * 100,
       JSON.stringify(result.results || {}),
       JSON.stringify(result.mcqResults || {}),
+      JSON.stringify(result.submittedCode || {}),
+      result.tabSwitchCount || 0,
       result.timestamp,
     ];
 
+    // Use immediate mode for faster writes
+    db.run("PRAGMA synchronous = NORMAL");
+    db.run("PRAGMA journal_mode = WAL");
+    
     db.run(insertSql, params, function (err) {
       if (err) {
-        console.error("Error saving result to database", err.message);
-        reject(err);
+        if (err.message.includes('UNIQUE constraint')) {
+          reject(new Error('Duplicate submission detected'));
+        } else {
+          console.error("Database error:", err.message);
+          reject(new Error('Database temporarily unavailable'));
+        }
       } else {
-        console.log(`A new result has been added with rowid ${this.lastID}`);
         resolve({ id: this.lastID, ...result });
       }
     });
   });
 };
 
-// Function to retrieve all test results
+// Optimized results retrieval with caching
+let resultsCache = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5000; // 5 seconds
+
 const getResults = () => {
   return new Promise((resolve, reject) => {
-    const selectAllSql = `SELECT * FROM results ORDER BY timestamp DESC;`;
+    const now = Date.now();
+    
+    // Return cached results if still valid
+    if (resultsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+      return resolve(resultsCache);
+    }
+    
+    const selectAllSql = `SELECT * FROM results ORDER BY totalScore DESC, timestamp ASC;`;
     db.all(selectAllSql, [], (err, rows) => {
       if (err) {
-        console.error("Error fetching results from database", err.message);
-        reject(err);
+        console.error("Error fetching results:", err.message);
+        reject(new Error('Database temporarily unavailable'));
       } else {
-        // Parse the JSON strings back into objects and map studentName to name
-        const results = rows.map((row) => ({
-          ...row,
-          name: row.studentName, // Map studentName to name for consistency
-          results: JSON.parse(row.results || "{}"),
-          mcqResults: JSON.parse(row.mcqResults || "{}"),
-        }));
-        resolve(results);
+        try {
+          const results = rows.map((row) => ({
+            ...row,
+            name: row.studentName,
+            results: JSON.parse(row.results || "{}"),
+            mcqResults: JSON.parse(row.mcqResults || "{}"),
+            submittedCode: JSON.parse(row.submittedCode || "{}"),
+          }));
+          
+          // Update cache
+          resultsCache = results;
+          cacheTimestamp = now;
+          
+          resolve(results);
+        } catch (parseError) {
+          console.error("Error parsing results:", parseError.message);
+          reject(new Error('Data parsing error'));
+        }
       }
     });
   });
+};
+
+// Clear cache when new results are added
+const clearResultsCache = () => {
+  resultsCache = null;
+  cacheTimestamp = 0;
 };
 
 // Function to clear all results (for testing/reset purposes)
@@ -123,8 +173,36 @@ const clearResults = () => {
   });
 };
 
+// Function to delete a specific result by ID
+const deleteResult = (id) => {
+  return new Promise((resolve, reject) => {
+    db.run("DELETE FROM results WHERE id = ?", [id], function (err) {
+      if (err) {
+        reject(err);
+      } else if (this.changes === 0) {
+        reject(new Error("No submission found with the given ID"));
+      } else {
+        resolve({
+          message: "Submission deleted successfully",
+          deletedCount: this.changes,
+        });
+      }
+    });
+  });
+};
+
 module.exports = {
-  saveResult,
+  saveResult: (result) => {
+    clearResultsCache();
+    return saveResult(result);
+  },
   getResults,
-  clearResults,
+  clearResults: () => {
+    clearResultsCache();
+    return clearResults();
+  },
+  deleteResult: (id) => {
+    clearResultsCache();
+    return deleteResult(id);
+  },
 };
