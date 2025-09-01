@@ -971,6 +971,11 @@
 
         function confirmDelete(id, rollNumber) {
             closeDeleteModal();
+            // Additional client-side confirmation for admin
+            if (!confirm(`Are you sure you want to permanently delete the submission for ${rollNumber}? This action cannot be undone.`)) {
+                showToast('info', 'Delete Cancelled', 'Submission was not deleted');
+                return;
+            }
             showToast('info', 'Deleting...', 'Removing submission from database');
             
             fetch(`/api/results/${id}`, { method: 'DELETE' })

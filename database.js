@@ -46,8 +46,16 @@ const createTable = () => {
       // Create index for faster lookups
       db.run("CREATE INDEX IF NOT EXISTS idx_rollNumber ON results(rollNumber)", () => {});
       db.run("CREATE INDEX IF NOT EXISTS idx_timestamp ON results(timestamp)", () => {});
-      db.run("ALTER TABLE results ADD COLUMN submittedCode TEXT", () => {});
-      db.run("ALTER TABLE results ADD COLUMN tabSwitchCount INTEGER DEFAULT 0", () => {});
+      db.run("ALTER TABLE results ADD COLUMN submittedCode TEXT", (err) => {
+        if (err && !err.message.includes("duplicate column name")) {
+          console.error("Error adding submittedCode column:", err.message);
+        }
+      });
+      db.run("ALTER TABLE results ADD COLUMN tabSwitchCount INTEGER DEFAULT 0", (err) => {
+        if (err && !err.message.includes("duplicate column name")) {
+          console.error("Error adding tabSwitchCount column:", err.message);
+        }
+      });
     }
   });
 };

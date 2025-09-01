@@ -10,6 +10,9 @@ const db = require("./database");
 const app = express();
 
 // Cluster setup for load handling
+// NOTE: Clustering is currently enabled only in production mode.
+// To enable clustering in development or testing, change the condition below.
+// Example: if (cluster.isMaster) { ... }
 if (cluster.isMaster && process.env.NODE_ENV === 'production') {
   const numCPUs = os.cpus().length;
   console.log(`🚀 Master process starting ${numCPUs} workers...`);
@@ -33,7 +36,6 @@ const limiter = rateLimit({
   message: "Too many requests, please wait",
   standardHeaders: false,
   legacyHeaders: false,
-  skip: (req) => req.url === '/api/submit', // Don't limit submissions
 });
 
 // Submission-specific rate limiter
@@ -72,7 +74,10 @@ function adminAuth(req, res, next) {
   const credentials = Buffer.from(auth.slice(6), 'base64').toString();
   const [username, password] = credentials.split(':');
   
-  if (username === 'atul@admin' && password === 'admin123') {
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'atul@admin';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     next();
   } else {
     res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
@@ -276,10 +281,11 @@ function autoGradeInternal(studentName, answers) {
 
         const compileCmd = `g++ -std=c++17 -O2 -Wall -Wextra -o "${exeName}" "${fileName}"`;
         exec(compileCmd, { 
-          timeout: 10000, // Reduced timeout
-          maxBuffer: 512 * 1024, // Reduced buffer
+          timeout: 10000,
+          maxBuffer: 512 * 1024,
           killSignal: 'SIGKILL'
         }, (error, stdout, stderr) => {
+
           if (error) {
             results[qNum] = {
               score: 0,
@@ -298,19 +304,19 @@ function autoGradeInternal(studentName, answers) {
           } else {
             const runCmd = process.platform === 'win32' ? `"${exeName}.exe"` : `"${exeName}"`;
             exec(runCmd, { 
-              timeout: 5000, // Reduced timeout
-              maxBuffer: 256 * 1024, // Reduced buffer
+              timeout: 5000,
+              maxBuffer: 256 * 1024,
               cwd: __dirname,
               killSignal: 'SIGKILL'
-            }, (runError, stdout, stderr) => {
+            }, (runError, runStdout, runStderr) => {
               if (runError) {
                 results[qNum] = {
                   score: 0,
-                  error: `Runtime Error: ${stderr || runError.message}`,
+                  error: `Runtime Error: ${runStderr || runError.message}`,
                   tests: [],
                 };
               } else {
-                const score = evaluateOutput(qNum, stdout, tests);
+                const score = evaluateOutput(qNum, runStdout, tests);
                 results[qNum] = score;
                 totalScore += score.score;
               }
