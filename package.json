@@ -13,6 +13,10 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
+    "dev:modular": "nodemon server-modular.js",
+    "start:modular": "node server-modular.js",
+    "dev:frontend-modular": "nodemon server.js --serve-modular",
+    "start:frontend-modular": "node server.js --serve-modular",
     "clear-db": "node scripts/clear-database.js",
     "db-status": "node scripts/database-status.js"
   },
