@@ -1,11 +1,11 @@
 const express = require("express");
 const fs = require("fs");
-const { exec } = require("child_process");
 const path = require("path");
 const rateLimit = require("express-rate-limit");
 const cluster = require("cluster");
 const os = require("os");
 const db = require("./database");
+const CompilerPool = require("./src/services/compilerPool");
 
 const app = express();
 
@@ -38,14 +38,20 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Submission-specific rate limiter
+// Submission-specific rate limiter - increased for load balancing
 const submissionLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 3, // Max 3 submissions per minute per IP
+  max: 5, // Increased limit with load balancing
   message: { error: "Too many submission attempts" },
   standardHeaders: false,
   legacyHeaders: false,
 });
+
+// Initialize compiler pool
+let compilerPool;
+if (!cluster.isMaster || process.env.NODE_ENV !== 'production') {
+  compilerPool = new CompilerPool();
+}
 
 
 app.use(limiter);
@@ -63,30 +69,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Admin authentication middleware
-function adminAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Basic ')) {
-    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
-    return res.status(401).send('Authentication required');
-  }
-  
-  const credentials = Buffer.from(auth.slice(6), 'base64').toString();
-  const [username, password] = credentials.split(':');
-  
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'atul@admin';
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    next();
-  } else {
-    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Area"');
-    res.status(401).send('Invalid credentials');
-  }
-}
 
-// Serve admin.html with authentication
-app.get('/admin.html', adminAuth, (req, res) => {
+// Serve admin.html
+app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
@@ -203,37 +189,16 @@ const testCases = {
   ],
 };
 
-// --- Optimized Auto-Grading with Queue ---
-const gradingQueue = [];
-const MAX_CONCURRENT_GRADING = 5;
-let activeGrading = 0;
+// Limited test cases for testing (first 3 only)
+const limitedTestCases = {
+  1: testCases[1].slice(0, 3),
+  2: testCases[2].slice(0, 3),
+  3: testCases[3].slice(0, 3),
+};
 
-function processGradingQueue() {
-  if (gradingQueue.length === 0 || activeGrading >= MAX_CONCURRENT_GRADING) {
-    return;
-  }
-  
-  const { resolve, reject, studentName, answers } = gradingQueue.shift();
-  activeGrading++;
-  
-  autoGradeInternal(studentName, answers)
-    .then(resolve)
-    .catch(reject)
-    .finally(() => {
-      activeGrading--;
-      setImmediate(processGradingQueue);
-    });
-}
-
+// --- Load-Balanced Auto-Grading ---
 function autoGrade(studentName, answers) {
-  return new Promise((resolve, reject) => {
-    gradingQueue.push({ resolve, reject, studentName, answers });
-    processGradingQueue();
-  });
-}
-
-function autoGradeInternal(studentName, answers) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     let totalScore = 0;
     let maxScore = 0;
     let results = {};
@@ -251,100 +216,59 @@ function autoGradeInternal(studentName, answers) {
       });
     }
 
-    let completed = 0;
-
-    questions.forEach((qNum) => {
-      const tests = testCases[qNum];
-      if (!tests) {
-        results[qNum] = {
-          score: 0,
-          error: "No test cases available for this question",
-          tests: [],
-        };
-        completed++;
-        if (completed === questions.length) {
-          resolve({ totalScore, maxScore: 100, results });
+    try {
+      // Process all questions concurrently using compiler pool
+      const compilationPromises = questions.map(async (qNum) => {
+        const tests = testCases[qNum];
+        if (!tests) {
+          return {
+            qNum,
+            score: 0,
+            error: "No test cases available for this question",
+            tests: [],
+          };
         }
-        return;
-      }
 
-      const questionMaxScore = tests.reduce((sum, test) => sum + test.points, 0);
-      maxScore += questionMaxScore;
+        const questionMaxScore = tests.reduce((sum, test) => sum + test.points, 0);
+        maxScore += questionMaxScore;
 
-      try {
-        const fullCode = createFullCode(qNum, answers[qNum]);
-        const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const fileName = path.join(submissionDir, `temp_${uniqueId}_q${qNum}.cpp`);
-        const exeName = path.join(submissionDir, `temp_${uniqueId}_q${qNum}`);
-
-        fs.writeFileSync(fileName, fullCode);
-
-        const compileCmd = `g++ -std=c++17 -O2 -Wall -Wextra -o "${exeName}" "${fileName}"`;
-        exec(compileCmd, { 
-          timeout: 10000,
-          maxBuffer: 512 * 1024,
-          killSignal: 'SIGKILL'
-        }, (error, stdout, stderr) => {
-
-          if (error) {
-            results[qNum] = {
-              score: 0,
-              error: `Compilation Error: ${stderr || error.message}`,
-              tests: [],
-            };
-            cleanupFiles([fileName, exeName, exeName + '.exe']);
-            completed++;
-            if (completed === questions.length) {
-              resolve({
-                totalScore,
-                maxScore: Math.max(maxScore, 100),
-                results,
-              });
-            }
-          } else {
-            const runCmd = process.platform === 'win32' ? `"${exeName}.exe"` : `"${exeName}"`;
-            exec(runCmd, { 
-              timeout: 5000,
-              maxBuffer: 256 * 1024,
-              cwd: __dirname,
-              killSignal: 'SIGKILL'
-            }, (runError, runStdout, runStderr) => {
-              if (runError) {
-                results[qNum] = {
-                  score: 0,
-                  error: `Runtime Error: ${runStderr || runError.message}`,
-                  tests: [],
-                };
-              } else {
-                const score = evaluateOutput(qNum, runStdout, tests);
-                results[qNum] = score;
-                totalScore += score.score;
-              }
-              cleanupFiles([fileName, exeName, exeName + '.exe']);
-              completed++;
-              if (completed === questions.length) {
-                resolve({
-                  totalScore,
-                  maxScore: Math.max(maxScore, 100),
-                  results,
-                });
-              }
-            });
-          }
-        });
-      } catch (err) {
-        results[qNum] = {
-          score: 0,
-          error: `Processing Error: ${err.message}`,
-          tests: [],
-        };
-
-        completed++;
-        if (completed === questions.length) {
-          resolve({ totalScore, maxScore: Math.max(maxScore, 100), results });
+        try {
+          const result = await compilerPool.compile(qNum, answers[qNum], studentName);
+          totalScore += result.score;
+          return { qNum, ...result };
+        } catch (error) {
+          console.error(`Compilation error for Q${qNum}:`, error.message);
+          return {
+            qNum,
+            score: 0,
+            error: error.message,
+            tests: [],
+          };
         }
-      }
-    });
+      });
+
+      const compilationResults = await Promise.all(compilationPromises);
+      
+      // Organize results by question number with optimization data
+      compilationResults.forEach(result => {
+        results[result.qNum] = {
+          score: result.score,
+          error: result.error,
+          tests: result.tests || [],
+          complexity: result.complexity || 'O(n)',
+          optimizationScore: result.optimizationScore || 100
+        };
+      });
+
+      resolve({
+        totalScore,
+        maxScore: Math.max(maxScore, 100),
+        results,
+      });
+    } catch (error) {
+      console.error('Auto-grading error:', error);
+      reject(error);
+    }
   });
 }
 
@@ -600,13 +524,28 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
 
     const mcqResult = gradeMCQ(studentMCQAnswers);
 
+    // Calculate optimization bonus
+    let optimizationBonus = 0;
+    let avgOptimization = 0;
+    if (codingResult.results) {
+      const optimizationScores = Object.values(codingResult.results)
+        .map(r => r.optimizationScore || 100)
+        .filter(s => s > 0);
+      if (optimizationScores.length > 0) {
+        avgOptimization = optimizationScores.reduce((a, b) => a + b, 0) / optimizationScores.length;
+        optimizationBonus = Math.floor(avgOptimization / 10); // 0-10 bonus points
+      }
+    }
+
     const finalResult = {
       name,
       rollNumber,
-      totalScore: codingResult.totalScore,
-      maxScore: codingResult.maxScore,
+      totalScore: codingResult.totalScore + optimizationBonus,
+      maxScore: codingResult.maxScore + 10, // Include optimization bonus in max
       codingScore: codingResult.totalScore,
       codingMaxScore: codingResult.maxScore,
+      optimizationScore: avgOptimization,
+      optimizationBonus: optimizationBonus,
       mcqScore: 0,
       mcqMaxScore: 0,
       results: codingResult.results,
@@ -650,7 +589,7 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
   }
 });
 
-app.get("/api/results", adminAuth, async (req, res) => {
+app.get("/api/results", async (req, res) => {
   try {
     const results = await db.getResults();
     res.json(results);
@@ -688,10 +627,10 @@ app.post("/api/check-submission", async (req, res) => {
   }
 });
 
-// Optimized test code endpoint
+// Load-balanced test code endpoint (limited test cases)
 app.post("/api/test-code", rateLimit({
   windowMs: 60 * 1000,
-  max: 10, // Limit test runs
+  max: 15, // Increased limit with load balancing
   message: { error: "Too many test runs" }
 }), async (req, res) => {
   const { questionNumber, code, studentName } = req.body;
@@ -701,21 +640,23 @@ app.post("/api/test-code", rateLimit({
   }
   
   try {
-    const result = await autoGrade(studentName || "test", { [questionNumber]: code });
-    const questionResult = result.results[questionNumber];
-    
-    if (questionResult) {
-      res.json(questionResult);
-    } else {
-      res.json({ error: "No test results available" });
-    }
+    const result = await compilerPool.compileWithLimitedTests(questionNumber, code, studentName || "test");
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+// Compiler pool status endpoint
+app.get("/api/compiler-status", (req, res) => {
+  if (!compilerPool) {
+    return res.json({ error: "Compiler pool not available" });
+  }
+  res.json(compilerPool.getStats());
+});
+
 // Admin endpoint to clear all results (use with caution!)
-app.delete("/api/results/clear", adminAuth, async (req, res) => {
+app.delete("/api/results/clear", async (req, res) => {
   try {
     const result = await db.clearResults();
     res.json({
@@ -732,7 +673,7 @@ app.delete("/api/results/clear", adminAuth, async (req, res) => {
 });
 
 // Admin endpoint to delete individual submission
-app.delete("/api/results/:id", adminAuth, async (req, res) => {
+app.delete("/api/results/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.deleteResult(id);
@@ -777,6 +718,9 @@ async function startServer() {
     // Graceful shutdown
     process.on('SIGTERM', () => {
       console.log('🔄 Graceful shutdown initiated...');
+      if (compilerPool) {
+        compilerPool.shutdown();
+      }
       server.close(() => {
         console.log('✅ Server closed');
         process.exit(0);

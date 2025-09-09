@@ -997,7 +997,7 @@
         <div class="exam-header">
             <div class="student-info">
                 <div class="welcome-text">Welcome, <span id="studentName">Student</span></div>
-                <div style="font-size: 0.875rem; color: #64748b;">Auto-save enabled</div>
+                <div style="font-size: 0.875rem; color: #64748b;">✅ Auto-save enabled</div>
             </div>
             <div class="exam-stats">
                 <div class="stat-item">
@@ -1022,23 +1022,23 @@
         <!-- Question 1 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">1. Count Elements Greater Than All Previous</div>
+                <div class="question-title">1. Product of Array Except Self</div>
                 <div class="question-points">33 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given an integer array <code>arr</code>, count the number of elements that are strictly greater than all the elements before them. The first element is always counted.
+                        Given an integer array <code>nums</code>, return an array <code>answer</code> such that <code>answer[i]</code> is equal to the product of all the elements of <code>nums</code> except <code>nums[i]</code>. You must write an algorithm that runs in O(n) time and without using the division operation.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> arr = [7, 4, 8, 2, 9]<br>
-                        <strong>Output:</strong> 3<br>
-                        <strong>Explanation:</strong> Elements 7 (first), 8, and 9 are greater than all prior elements.
+                        <strong>Input:</strong> nums = [1,2,3,4]<br>
+                        <strong>Output:</strong> [24,12,8,6]<br>
+                        <strong>Explanation:</strong> For index 0: 2×3×4=24, index 1: 1×3×4=12, etc.
                     </div>
                 </div>
 
@@ -1046,8 +1046,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>1 ≤ arr.length ≤ 10<sup>5</sup></li>
-                            <li>1 ≤ arr[i] ≤ 10<sup>9</sup></li>
+                            <li>2 ≤ nums.length ≤ 10<sup>5</sup></li>
+                            <li>-30 ≤ nums[i] ≤ 30</li>
+                            <li>The product of any prefix or suffix is guaranteed to fit in 32-bit integer</li>
                         </ul>
                     </div>
                 </div>
@@ -1056,22 +1057,23 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [7, 4, 8, 2, 9] → 3
+                            <strong>Test 1:</strong> [1,2,3,4] → [24,12,8,6]
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [1, 2, 3, 4, 5] → 5 (all increasing)
+                            <strong>Test 2:</strong> [2,0,4] → [0,8,0]
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [5, 4, 3, 2, 1] → 1 (only first element)
+                            <strong>Test 3:</strong> [1,1,1,1] → [1,1,1,1]
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">int countGreaterThanPrior(const vector&lt;int&gt;&amp; arr);</div>
+                <div class="code-signature">vector&lt;int&gt; productExceptSelf(vector&lt;int&gt;&amp; nums);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q1">int countGreaterThanPrior(const vector<int>& arr) {
+                    <textarea class="code-textarea" id="q1">vector<int> productExceptSelf(vector<int>& nums) {
     // Implement this function
-    return 0;
+    vector<int> result(nums.size(), 1);
+    return result;
 }</textarea>
                 </div>
                 <div class="question-actions">
@@ -1087,25 +1089,23 @@
         <!-- Question 2 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">2. Row with Maximum 1's</div>
+                <div class="question-title">2. Largest Subarray with Sum Zero</div>
                 <div class="question-points">33 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given a binary matrix (containing only 0s and 1s), find the row number (1-indexed) that has the maximum number of 1s. If multiple rows have the same maximum count, return the first such row.
+                        Given an array of integers, find the length of the largest subarray with sum equal to 0. A subarray is a contiguous sequence of elements within an array.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> matrix = [[0,1,0],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,1,0],<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1,1,1]]<br>
-                        <strong>Output:</strong> 3<br>
-                        <strong>Explanation:</strong> Row 3 has 3 ones which is maximum.
+                        <strong>Input:</strong> arr = [15, -2, 2, -8, 1, 7, 10, 23]<br>
+                        <strong>Output:</strong> 5<br>
+                        <strong>Explanation:</strong> Subarray [-2, 2, -8, 1, 7] has sum 0 and length 5.
                     </div>
                 </div>
 
@@ -1113,9 +1113,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>1 ≤ number of rows ≤ 10<sup>4</sup></li>
-                            <li>1 ≤ number of columns ≤ 10<sup>4</sup></li>
-                            <li>Each element is either 0 or 1</li>
+                            <li>1 ≤ arr.length ≤ 10<sup>5</sup></li>
+                            <li>-10<sup>4</sup> ≤ arr[i] ≤ 10<sup>4</sup></li>
+                            <li>Return 0 if no such subarray exists</li>
                         </ul>
                     </div>
                 </div>
@@ -1124,20 +1124,20 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [[0,1,0],[1,1,0],[1,1,1]] → 3
+                            <strong>Test 1:</strong> [15,-2,2,-8,1,7,10,23] → 5
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [[0,0,0],[0,0,0],[0,0,0]] → 1 (all have 0 ones)
+                            <strong>Test 2:</strong> [1,2,3,4,5] → 0 (no zero sum subarray)
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [[1,0],[1,1],[0,1]] → 2
+                            <strong>Test 3:</strong> [1,2,-3,3] → 3
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">int rowWithMaxOnes(const vector&lt;vector&lt;int&gt;&gt;&amp; matrix);</div>
+                <div class="code-signature">int largestZeroSumSubarray(vector&lt;int&gt;&amp; nums);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q2">int rowWithMaxOnes(const vector<vector<int>>& matrix) {
+                    <textarea class="code-textarea" id="q2">int largestZeroSumSubarray(vector<int>& nums) {
     // Implement this function
     return 0;
 }</textarea>
@@ -1155,23 +1155,23 @@
         <!-- Question 3 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">3. Move Zeros to End</div>
+                <div class="question-title">3. Longest Consecutive Sequence</div>
                 <div class="question-points">34 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given an integer array <code>arr</code>, move all zeros to the end while maintaining the relative order of the non-zero elements. Modify the array in-place.
+                        Given an unsorted array of integers <code>nums</code>, return the length of the longest consecutive elements sequence. You must write an algorithm that runs in O(n) time.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> arr = [4, 5, 0, 1, 9, 0, 5, 0]<br>
-                        <strong>Output:</strong> arr becomes [4, 5, 1, 9, 5, 0, 0, 0]<br>
-                        <strong>Explanation:</strong> All zeros moved to end, non-zero order preserved.
+                        <strong>Input:</strong> nums = [100,4,200,1,3,2]<br>
+                        <strong>Output:</strong> 4<br>
+                        <strong>Explanation:</strong> The longest consecutive sequence is [1,2,3,4] with length 4.
                     </div>
                 </div>
 
@@ -1179,8 +1179,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>1 ≤ arr.length ≤ 10<sup>5</sup></li>
-                            <li>-10<sup>9</sup> ≤ arr[i] ≤ 10<sup>9</sup></li>
+                            <li>0 ≤ nums.length ≤ 10<sup>5</sup></li>
+                            <li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
+                            <li>Algorithm must run in O(n) time complexity</li>
                         </ul>
                     </div>
                 </div>
@@ -1189,21 +1190,22 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [4,5,0,1,9,0,5,0] → [4,5,1,9,5,0,0,0]
+                            <strong>Test 1:</strong> [100,4,200,1,3,2] → 4
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [0,0,0,0] → [0,0,0,0]
+                            <strong>Test 2:</strong> [9,1,4,7,3,-1,0,5,8,-1,6] → 7
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [1,2,3,4] → [1,2,3,4] (no zeros)
+                            <strong>Test 3:</strong> [1,2,0,1] → 3 (sequence: 0,1,2)
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">void moveZerosToEnd(vector&lt;int&gt;&amp; arr);</div>
+                <div class="code-signature">int longestConsecutive(vector&lt;int&gt;&amp; nums);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q3">void moveZerosToEnd(vector<int>& arr) {
+                    <textarea class="code-textarea" id="q3">int longestConsecutive(vector<int>& nums) {
     // Implement this function
+    return 0;
 }</textarea>
                 </div>
                 <div class="question-actions">
@@ -1275,116 +1277,45 @@
         let timer;
 
         const defaultTemplates = {
-            1: `int countGreaterThanPrior(const vector<int>& arr) {\n    // Implement this function\n    return 0;\n}`,
-            2: `int rowWithMaxOnes(const vector<vector<int>>& matrix) {\n    // Implement this function\n    return 0;\n}`,
-            3: `void moveZerosToEnd(vector<int>& arr) {\n    // Implement this function\n}`
+            1: `vector<int> productExceptSelf(vector<int>& nums) {\n    // Implement this function\n    vector<int> result(nums.size(), 1);\n    return result;\n}`,
+            2: `int largestZeroSumSubarray(vector<int>& nums) {\n    // Implement this function\n    return 0;\n}`,
+            3: `int longestConsecutive(vector<int>& nums) {\n    // Implement this function\n    return 0;\n}`
         };
 
-        // Richa's Special Features
-        let richaEncouragementCount = 0;
+        // Richa's Special Features - Optimized
+        let richaLastEncouragement = 0;
+        let richaTestCount = 0;
         const richaMessages = [
-            "You're doing amazing, Richa! 🎆💖",
-            "Keep up the excellent work! ✨🦋",
-            "Your coding skills are impressive! 💪💖",
-            "Almost there, you've got this! 🌈👋",
-            "Brilliant problem-solving, Richa! 🎆✨",
-            "You're crushing this exam! 🚀💖",
-            "Outstanding progress! 🌟🦋",
-            "Your dedication shows! 💫👋"
-        ];
-        
-        const richaSaveQuotes = [
-            "Fantastic save, Richa! Your code is poetry! 📝✨",
-            "Brilliant work! You're coding like a pro! 🌟💻",
-            "Amazing progress! Keep that momentum going! 🚀💖",
-            "Excellent logic, Richa! You're unstoppable! 💪🎆",
-            "Perfect save! Your skills are shining bright! ⭐💫",
-            "Outstanding work! You're making it look easy! 🦋✨",
-            "Incredible coding, Richa! You're on fire! 🔥💖",
-            "Superb solution! Your talent is remarkable! 🌈🎯",
-            "Flawless execution! You're absolutely crushing it! 💎🚀",
-            "Magnificent work! Every line shows your brilliance! 🎨💫",
-            "Stellar coding! You're writing magic with every keystroke! ✨🪄",
-            "Phenomenal progress! Your dedication is inspiring! 🌟💪",
-            "Exceptional work, Richa! You're a coding goddess! 👑💖",
-            "Brilliant save! Your problem-solving is next level! 🧠🎆",
-            "Amazing technique! You're coding with pure elegance! 💃✨"
+            "Welcome Richa! Ready to shine? ✨💖",
+            "Great progress! Keep going! 🌟",
+            "Excellent work! 🚀💫",
+            "You're doing fantastic! 💪✨"
         ];
         
         const richaTestQuotes = [
-            "Tests passed! Richa, you're absolutely brilliant! 🎉💖",
-            "Perfect execution! Your code runs like a dream! ✨🚀",
-            "Flawless logic! You're a coding superstar! ⭐💫",
-            "Outstanding results! Your skills are phenomenal! 🌟🎆",
-            "Incredible work! Every test case bows to your genius! 👑💻",
-            "Magnificent coding! You're redefining excellence! 💎✨",
-            "Spectacular success! Your talent knows no bounds! 🦋🌈",
-            "Brilliant execution! You make complex look simple! 🧠💪",
-            "Exceptional performance! You're coding perfection! 🎯💖",
-            "Phenomenal results! Your code is pure artistry! 🎨🚀",
-            "Stellar achievement! You're writing coding history! 📚✨",
-            "Remarkable success! Your logic is absolutely divine! 🌟💫",
-            "Extraordinary work! You're the definition of coding excellence! 💎🎆",
-            "Incredible mastery! Your solutions are works of art! 🖼️💖",
-            "Breathtaking results! You're coding with the power of stars! ⭐🌟"
+            "Nice work, Richa! 🎉",
+            "Great job! ✨",
+            "Excellent! 🌟",
+            "Perfect! 💫"
         ];
 
         function richaEncouragement() {
-            // Every minute - heart pulse
-            if (timeLeft % 60 === 0 && timeLeft > 0) {
-                createMinuteHeart();
-            }
-            
-            // Every 2 minutes - waving hand
-            if (timeLeft % 120 === 0 && timeLeft > 0) {
-                createWavingHand();
-            }
-            
-            // Every 3 minutes - butterfly
-            if (timeLeft % 180 === 0 && timeLeft > 0) {
-                createButterfly();
-            }
-            
-            // Every 5 minutes - full encouragement
-            if (timeLeft % 300 === 0 && timeLeft > 0) {
-                createFloatingEmojis(['🎆', '✨', '💫', '🌈', '🚀']);
-                
-                if (richaEncouragementCount < richaMessages.length) {
-                    setTimeout(() => {
-                        showRichaMessage(richaMessages[richaEncouragementCount]);
-                        richaEncouragementCount++;
-                    }, 1000);
-                }
+            const now = Date.now();
+            // Every 20 minutes (1200 seconds)
+            if (timeLeft % 1200 === 0 && timeLeft > 0 && (now - richaLastEncouragement) > 1200000) {
+                richaLastEncouragement = now;
+                const message = richaMessages[Math.floor(Math.random() * richaMessages.length)];
+                showRichaMessage(message);
+                createFloatingEmojis(['✨', '💖']);
             }
         }
 
         function richaSuccessCelebration(passed, total) {
-            if (passed === total) {
-                // All tests passed - big celebration
-                createFloatingEmojis(['🎉', '🎆', '✨', '💫', '🌈', '👑', '💎', '⭐']);
-                createSparkles(20);
-                const perfectQuotes = [
-                    "PERFECT SCORE! Richa, you're absolutely phenomenal! 👑🎆",
-                    "FLAWLESS VICTORY! Your coding mastery is unmatched! 💎✨",
-                    "100% SUCCESS! You're rewriting the definition of excellence! ⭐🚀",
-                    "ABSOLUTE PERFECTION! Your brilliance knows no limits! 🌟💖",
-                    "LEGENDARY PERFORMANCE! You're coding royalty! 👑🎉"
-                ];
-                showRichaMessage(perfectQuotes[Math.floor(Math.random() * perfectQuotes.length)]);
-                createWavingHand();
-                createMinuteHeart();
-            } else if (passed > 0) {
-                // Some tests passed - encouragement
-                createFloatingEmojis(['✨', '💫', '🚀', '🌟']);
-                createSparkles(12);
-                const partialQuotes = [
-                    `Excellent progress! ${passed}/${total} tests conquered! 🌟💪`,
-                    `Amazing work! ${passed}/${total} victories and counting! 🚀✨`,
-                    `Brilliant effort! ${passed}/${total} tests bow to your skill! 💫🎯`,
-                    `Outstanding! ${passed}/${total} successes show your talent! 🎆💖`,
-                    `Incredible! ${passed}/${total} tests prove your genius! ⭐🦋`
-                ];
-                showRichaMessage(partialQuotes[Math.floor(Math.random() * partialQuotes.length)]);
+            richaTestCount++;
+            if (passed > 0 && richaTestCount % 3 === 0) { // Every 3rd test run
+                const message = richaTestQuotes[Math.floor(Math.random() * richaTestQuotes.length)];
+                showRichaMessage(message);
+                createFloatingEmojis(['✨', '💖']);
             }
         }
 
@@ -1487,9 +1418,8 @@
             
             // Welcome message for Richa
             setTimeout(() => {
-                showRichaMessage('Welcome to your special exam, Richa! ✨💖');
-                createWavingHand();
-                createFloatingEmojis(['🎉', '✨', '💖']);
+                showRichaMessage('Welcome Richa! Ready to shine? ✨💖');
+                createFloatingEmojis(['✨', '💖']);
             }, 1000);
             
             // Periodic motivation for Richa
@@ -1560,6 +1490,14 @@
         });
 
         function showToast(type, title, message) {
+            // Remove existing toasts of same type to prevent spam
+            const existingToasts = document.querySelectorAll(`.toast-${type}`);
+            existingToasts.forEach(toast => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            });
+            
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             
@@ -1580,8 +1518,9 @@
             
             document.body.appendChild(toast);
             
-            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => toast.classList.add('show'), 50);
             
+            const duration = type === 'error' ? 5000 : 3000;
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => {
@@ -1589,7 +1528,7 @@
                         document.body.removeChild(toast);
                     }
                 }, 300);
-            }, 3000);
+            }, duration);
         }
 
         function setupAuth() {
@@ -1732,9 +1671,13 @@
         
         function initializeExamSecurity() {
             examSecurityActive = true;
+            console.log('🔒 Exam security initialized');
             
             // Disable right-click
-            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                showToast('warning', 'Action Blocked', 'Right-click is disabled during exam.');
+            });
             
             // Disable F12, Ctrl+Shift+I, Ctrl+U
             document.addEventListener('keydown', function(e) {
@@ -1746,38 +1689,58 @@
                 }
             });
             
-            // Tab switch detection
-            document.addEventListener('visibilitychange', function() {
-                if (examSecurityActive && document.hidden) {
+            // Enhanced tab switch detection
+            const handleVisibilityChange = () => {
+                if (!examSecurityActive) return;
+                
+                if (document.hidden) {
                     tabSwitchCount++;
-                    showToast('warning', 'Tab Switch Detected', `Warning ${tabSwitchCount}/3: Stay on exam tab`);
+                    console.log(`⚠️ Tab switch detected: ${tabSwitchCount}/3`);
+                    
+                    showToast('warning', 'Tab Switch Warning', `Warning ${tabSwitchCount}/3: Stay on exam tab!`);
                     
                     if (tabSwitchCount >= 3) {
-                        showToast('error', 'Exam Terminated', 'Too many tab switches. Exam will be auto-submitted.');
-                        setTimeout(() => {
-                            submitTest();
-                        }, 2000);
+                        console.log('🚨 Auto-submitting due to tab switches');
+                        showToast('error', 'Exam Auto-Submit', 'Too many tab switches. Submitting exam now!');
+                        examSecurityActive = false;
+                        setTimeout(() => submitTest(), 1500);
                     }
+                }
+            };
+            
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            window.addEventListener('blur', handleVisibilityChange);
+            window.addEventListener('focus', () => {
+                if (examSecurityActive && tabSwitchCount > 0) {
+                    showToast('info', 'Focus Restored', `Warnings: ${tabSwitchCount}/3`);
                 }
             });
             
-            // Disable copy-paste from external sources
+            // Anti-cheating: Block external paste
+            let lastCopySource = null;
+            
+            document.addEventListener('copy', function(e) {
+                if (e.target.classList.contains('code-textarea')) {
+                    lastCopySource = 'internal';
+                    setTimeout(() => lastCopySource = null, 1000);
+                }
+            });
+            
             document.addEventListener('paste', function(e) {
                 const target = e.target;
                 if (target.classList.contains('code-textarea')) {
-                    // Allow paste within code editors
-                    return;
+                    if (lastCopySource !== 'internal') {
+                        e.preventDefault();
+                        showToast('error', 'Paste Blocked', 'External code paste not allowed!');
+                        console.warn(`🚨 Cheating attempt: ${window.studentRollNumber} - External paste`);
+                        return;
+                    }
+                    lastCopySource = null;
+                } else {
+                    e.preventDefault();
+                    showToast('warning', 'Paste Blocked', 'Paste only allowed in code editors.');
                 }
-                e.preventDefault();
-                showToast('warning', 'Paste Blocked', 'External paste is not allowed during exam.');
             });
-            
-            // Full screen request
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {
-                    showToast('warning', 'Fullscreen Recommended', 'Please enable fullscreen for better exam experience.');
-                });
-            }
         }
 
         function setupCodeEditors() {
@@ -1787,6 +1750,12 @@
                 textarea.addEventListener("input", function() {
                     updateQuestionStatus(i);
                     updateCompletedCount();
+                    
+                    // Auto-save after 2 seconds of inactivity
+                    clearTimeout(textarea.autoSaveTimer);
+                    textarea.autoSaveTimer = setTimeout(() => {
+                        autoSaveAnswer(i);
+                    }, 2000);
                 });
 
                 textarea.addEventListener("keydown", function(e) {
@@ -1814,12 +1783,23 @@
                         this.selectionStart = this.selectionEnd = start + newText.length;
                     }
                     
-                    // Auto-close braces
-                    if (e.key === '{') {
+                    // Auto-close brackets and parentheses
+                    const autoCloseMap = {
+                        '{': '}',
+                        '(': ')',
+                        '[': ']'
+                    };
+                    
+                    if (autoCloseMap[e.key]) {
                         setTimeout(() => {
                             const start = this.selectionStart;
-                            if (this.value[start] !== '}') {
-                                this.value = this.value.substring(0, start) + '\n}' + this.value.substring(start);
+                            const closeChar = autoCloseMap[e.key];
+                            if (this.value[start] !== closeChar) {
+                                if (e.key === '{') {
+                                    this.value = this.value.substring(0, start) + '\n}' + this.value.substring(start);
+                                } else {
+                                    this.value = this.value.substring(0, start) + closeChar + this.value.substring(start);
+                                }
                                 this.selectionStart = this.selectionEnd = start;
                             }
                         }, 0);
@@ -1829,6 +1809,7 @@
         }
 
         function startTimer() {
+            console.log('⏰ Timer started: 60 minutes');
             timer = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
@@ -1840,16 +1821,20 @@
                 }
 
                 // Warning toasts
-                if (timeLeft === 300) { // 5 minutes
-                    showToast('warning', 'Time Warning', '5 minutes remaining! Please review your answers.');
+                if (timeLeft === 600) { // 10 minutes
+                    showToast('warning', 'Time Warning', '10 minutes remaining!');
+                } else if (timeLeft === 300) { // 5 minutes
+                    showToast('warning', 'Time Warning', '5 minutes left! Review your answers.');
                 } else if (timeLeft === 60) { // 1 minute
                     showToast('error', 'Final Warning', '1 minute left! Prepare to submit.');
                 }
 
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    showToast('error', 'Time Up!', 'Auto-submitting your exam now...');
-                    setTimeout(() => submitTest(), 2000);
+                    examSecurityActive = false;
+                    console.log('⏰ Time expired - auto-submitting');
+                    showToast('error', 'Time Up!', 'Auto-submitting exam now...');
+                    setTimeout(() => submitTest(), 1500);
                 }
             }, 1000);
         }
@@ -1914,16 +1899,29 @@
             localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
             showToast('success', 'Answer Saved', `Question ${qNum} saved successfully`);
             
-            // Special encouragement for Richa after saving
+            // Gentle encouragement for Richa after saving
             if (window.studentRollNumber === '25MCSS02') {
-                createFloatingEmojis(['✨', '💫', '🌟', '💖', '🎆']);
-                createSparkles(8);
+                createFloatingEmojis(['✨', '💖']);
                 setTimeout(() => {
-                    const randomQuote = richaSaveQuotes[Math.floor(Math.random() * richaSaveQuotes.length)];
-                    showRichaMessage(randomQuote);
-                    createMinuteHeart();
+                    showRichaMessage("Great save! 💫");
                 }, 500);
             }
+        }
+        
+        function autoSaveAnswer(qNum) {
+            const textarea = document.getElementById("q" + qNum);
+            const answer = textarea.value.trim();
+            
+            if (!answer || answer === defaultTemplates[qNum].trim()) {
+                return; // Don't auto-save empty or default content
+            }
+            
+            answers[qNum] = answer;
+            localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
+            
+            // Update status to show it's auto-saved
+            const statusDot = document.getElementById("status" + qNum);
+            statusDot.className = "status-dot status-saved";
         }
         
         function formatCppCode(code) {
@@ -1967,18 +1965,23 @@
             // Add space after keywords
             line = line.replace(/\b(if|for|while|switch)\s*\(/g, '$1 (');
             
-            // Add spaces around operators
-            line = line.replace(/([^=!<>])=([^=])/g, '$1 = $2');
+            // Add spaces around compound operators
+            line = line.replace(/(\w)\s*\+=\s*(\w)/g, '$1 += $2');
+            line = line.replace(/(\w)\s*-=\s*(\w)/g, '$1 -= $2');
+            line = line.replace(/(\w)\s*\*=\s*(\w)/g, '$1 *= $2');
+            line = line.replace(/(\w)\s*\/=\s*(\w)/g, '$1 /= $2');
+            line = line.replace(/(\w)\s*%=\s*(\w)/g, '$1 %= $2');
+            
+            // Add spaces around single = but NOT compound operators
+            line = line.replace(/([^+\-*\/!<>=])=([^=])/g, '$1 = $2');
+            
+            // Add spaces around comparison operators
             line = line.replace(/([^=!<>])==([^=])/g, '$1 == $2');
             line = line.replace(/([^=!<>])!=([^=])/g, '$1 != $2');
             line = line.replace(/([^<])<=([^=])/g, '$1 <= $2');
             line = line.replace(/([^>])>=([^=])/g, '$1 >= $2');
             line = line.replace(/([^<>])<([^<=])/g, '$1 < $2');
             line = line.replace(/([^<>])>([^>=])/g, '$1 > $2');
-            line = line.replace(/([^+])\+([^+=])/g, '$1 + $2');
-            line = line.replace(/([^-])-([^-=])/g, '$1 - $2');
-            line = line.replace(/([^*])\*([^*=])/g, '$1 * $2');
-            line = line.replace(/([^/])\/([^/=])/g, '$1 / $2');
             
             // Add space after commas
             line = line.replace(/,([^\s])/g, ', $1');
@@ -2010,20 +2013,24 @@
             // Gentle encouragement for Richa when clearing
             if (window.studentRollNumber === '25MCSS02') {
                 setTimeout(() => {
-                    showRichaMessage("Fresh start! You've got this! 💪✨");
-                    createWavingHand();
+                    showRichaMessage("Fresh start! 💪");
                 }, 300);
             }
         }
 
         function runCode(qNum) {
-            const code = document.getElementById("q" + qNum).value.trim();
+            const textarea = document.getElementById("q" + qNum);
+            let code = textarea.value.trim();
             const outputDiv = document.getElementById("output" + qNum);
             
             if (!code || code === defaultTemplates[qNum].trim()) {
                 showToast('warning', 'No Code to Run', 'Please write some code before testing');
                 return;
             }
+            
+            // Auto-format code before running
+            code = formatCppCode(code);
+            textarea.value = code;
             
             showToast('info', 'Running Tests', 'Compiling and testing your code...');
             outputDiv.innerHTML = '<div style="color: #3b82f6;">🔄 Compiling and testing...</div>';
@@ -2086,8 +2093,9 @@
                                 <span>${test.points}/${test.points || 10} pts</span>
                             </div>
                             <div style="font-size: 0.8rem; opacity: 0.9;">
-                                Expected: <code>${test.expected}</code><br>
-                                Your Output: <code>${test.actual}</code>
+                                <strong>Input:</strong> <code>${test.input || 'Hidden'}</code><br>
+                                <strong>Expected:</strong> <code>${test.expected}</code><br>
+                                <strong>Your Output:</strong> <code>${test.actual}</code>
                             </div>
                         </div>
                     `;
@@ -2108,23 +2116,16 @@
                     </div>
                     <div class="test-summary">
                         <div style="font-weight: 600; margin-bottom: 0.5rem;">Score: ${totalScore}/${maxScore} points</div>
-                        <div style="font-size: 0.875rem; opacity: 0.8;">Accuracy: ${Math.round((totalScore/maxScore)*100)}%</div>
+                        <div style="font-size: 0.875rem; opacity: 0.8;">Accuracy: ${maxScore > 0 ? Math.round((totalScore/maxScore)*100) : 0}%</div>
                     </div>
                 ` + html;
             }
             
             outputDiv.innerHTML = html;
             
-            // Special celebration for Richa on successful runs
+            // Gentle celebration for Richa on successful runs
             if (window.studentRollNumber === '25MCSS02' && passedCount > 0) {
                 richaSuccessCelebration(passedCount, results.tests.length);
-                
-                // Extra random quote for successful test runs
-                setTimeout(() => {
-                    const randomQuote = richaTestQuotes[Math.floor(Math.random() * richaTestQuotes.length)];
-                    showRichaMessage(randomQuote);
-                    createButterfly();
-                }, 1500);
             }
         }
 
@@ -2214,32 +2215,27 @@
             
             // Special celebration for Richa
             if (window.studentRollNumber === '25MCSS02') {
-                overlay.style.background = 'linear-gradient(135deg, rgba(255, 105, 180, 0.95), rgba(255, 20, 147, 0.95))';
-                
                 overlay.innerHTML = `
                     <div class="success-content">
-                        <div class="success-icon">🎉💖✨</div>
-                        <h1 class="success-title">Outstanding Work, Richa!</h1>
-                        <p class="success-message">You've completed your special exam with flying colors! 🌟🦋</p>
+                        <div class="success-icon">🎉</div>
+                        <h1 class="success-title">Excellent Work, Richa!</h1>
+                        <p class="success-message">You've completed your exam successfully! 🌟</p>
                         <div class="success-details">
-                            <h3 style="margin-bottom: 1rem;">🎆 Your Amazing Results 🎆</h3>
-                            <p><strong>Score:</strong> ${data.totalScore || 0}/${data.maxScore || 100} (${percentage}%) 💫</p>
-                            <p><strong>Submitted:</strong> ${new Date().toLocaleString()} ✨</p>
-                            <p style="margin-top: 1rem; font-style: italic; color: #fff;">"Excellence is not a skill, it's an attitude" - You've shown both! 💖</p>
+                            <h3 style="margin-bottom: 1rem;">Your Results</h3>
+                            <p><strong>Score:</strong> ${data.totalScore || 0}/${data.maxScore || 100} (${percentage}%)</p>
+                            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                         </div>
-                        <p style="opacity: 0.9; margin-top: 1rem;">This magical window will close in 8 seconds... 🌈</p>
+                        <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>
                     </div>
-                    ${Array.from({length: 15}, (_, i) => '<div class="confetti"></div>').join('')}
+                    ${Array.from({length: 9}, (_, i) => '<div class="confetti"></div>').join('')}
                 `;
                 
-                // Extra celebration effects for Richa
-                createFloatingEmojis(['🎉', '🎆', '✨', '💖', '🌟', '🦋', '🌈', '💫']);
-                createSparkles(25);
+                createFloatingEmojis(['🎉', '✨', '💖']);
                 
                 setTimeout(() => {
                     window.close();
                     window.location.href = 'about:blank';
-                }, 8000);
+                }, 5000);
             } else {
                 overlay.innerHTML = `
                     <div class="success-content">
