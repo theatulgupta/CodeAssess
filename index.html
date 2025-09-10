@@ -1022,23 +1022,23 @@
         <!-- Question 1 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">1. Product of Array Except Self</div>
+                <div class="question-title">1. Transpose of Matrix</div>
                 <div class="question-points">33 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given an integer array <code>nums</code>, return an array <code>answer</code> such that <code>answer[i]</code> is equal to the product of all the elements of <code>nums</code> except <code>nums[i]</code>. You must write an algorithm that runs in O(n) time and without using the division operation.
+                        Given a 2D matrix, return the transpose of the matrix. The transpose of a matrix is obtained by changing rows to columns and columns to rows.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> nums = [1,2,3,4]<br>
-                        <strong>Output:</strong> [24,12,8,6]<br>
-                        <strong>Explanation:</strong> For index 0: 2×3×4=24, index 1: 1×3×4=12, etc.
+                        <strong>Input:</strong> matrix = [[1,2,3],[4,5,6],[7,8,9]]<br>
+                        <strong>Output:</strong> [[1,4,7],[2,5,8],[3,6,9]]<br>
+                        <strong>Explanation:</strong> Rows become columns and columns become rows.
                     </div>
                 </div>
 
@@ -1046,9 +1046,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>2 ≤ nums.length ≤ 10<sup>5</sup></li>
-                            <li>-30 ≤ nums[i] ≤ 30</li>
-                            <li>The product of any prefix or suffix is guaranteed to fit in 32-bit integer</li>
+                            <li>1 ≤ matrix.length ≤ 1000</li>
+                            <li>1 ≤ matrix[i].length ≤ 1000</li>
+                            <li>-10<sup>9</sup> ≤ matrix[i][j] ≤ 10<sup>9</sup></li>
                         </ul>
                     </div>
                 </div>
@@ -1057,22 +1057,22 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [1,2,3,4] → [24,12,8,6]
+                            <strong>Test 1:</strong> [[1,2,3],[4,5,6]] → [[1,4],[2,5],[3,6]]
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [2,0,4] → [0,8,0]
+                            <strong>Test 2:</strong> [[1,2],[3,4],[5,6]] → [[1,3,5],[2,4,6]]
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [1,1,1,1] → [1,1,1,1]
+                            <strong>Test 3:</strong> [[1]] → [[1]]
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">vector&lt;int&gt; productExceptSelf(vector&lt;int&gt;&amp; nums);</div>
+                <div class="code-signature">vector&lt;vector&lt;int&gt;&gt; transpose(vector&lt;vector&lt;int&gt;&gt;&amp; matrix);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q1">vector<int> productExceptSelf(vector<int>& nums) {
+                    <textarea class="code-textarea" id="q1">vector<vector<int>> transpose(vector<vector<int>>& matrix) {
     // Implement this function
-    vector<int> result(nums.size(), 1);
+    vector<vector<int>> result;
     return result;
 }</textarea>
                 </div>
@@ -1089,23 +1089,23 @@
         <!-- Question 2 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">2. Largest Subarray with Sum Zero</div>
+                <div class="question-title">2. Merge Two Sorted Arrays</div>
                 <div class="question-points">33 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given an array of integers, find the length of the largest subarray with sum equal to 0. A subarray is a contiguous sequence of elements within an array.
+                        Given two sorted arrays <code>nums1</code> and <code>nums2</code>, merge them into a single sorted array and return it. The merged array should be sorted in non-decreasing order.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> arr = [15, -2, 2, -8, 1, 7, 10, 23]<br>
-                        <strong>Output:</strong> 5<br>
-                        <strong>Explanation:</strong> Subarray [-2, 2, -8, 1, 7] has sum 0 and length 5.
+                        <strong>Input:</strong> nums1 = [1,2,3], nums2 = [2,5,6]<br>
+                        <strong>Output:</strong> [1,2,2,3,5,6]<br>
+                        <strong>Explanation:</strong> Merge both arrays maintaining sorted order.
                     </div>
                 </div>
 
@@ -1113,9 +1113,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>1 ≤ arr.length ≤ 10<sup>5</sup></li>
-                            <li>-10<sup>4</sup> ≤ arr[i] ≤ 10<sup>4</sup></li>
-                            <li>Return 0 if no such subarray exists</li>
+                            <li>0 ≤ nums1.length, nums2.length ≤ 200</li>
+                            <li>1 ≤ nums1.length + nums2.length ≤ 200</li>
+                            <li>-10<sup>9</sup> ≤ nums1[i], nums2[j] ≤ 10<sup>9</sup></li>
                         </ul>
                     </div>
                 </div>
@@ -1124,22 +1124,23 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [15,-2,2,-8,1,7,10,23] → 5
+                            <strong>Test 1:</strong> [1,2,3] + [2,5,6] → [1,2,2,3,5,6]
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [1,2,3,4,5] → 0 (no zero sum subarray)
+                            <strong>Test 2:</strong> [1] + [] → [1]
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [1,2,-3,3] → 3
+                            <strong>Test 3:</strong> [] + [1] → [1]
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">int largestZeroSumSubarray(vector&lt;int&gt;&amp; nums);</div>
+                <div class="code-signature">vector&lt;int&gt; mergeSortedArrays(vector&lt;int&gt;&amp; nums1, vector&lt;int&gt;&amp; nums2);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q2">int largestZeroSumSubarray(vector<int>& nums) {
+                    <textarea class="code-textarea" id="q2">vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {
     // Implement this function
-    return 0;
+    vector<int> result;
+    return result;
 }</textarea>
                 </div>
                 <div class="question-actions">
@@ -1155,23 +1156,23 @@
         <!-- Question 3 -->
         <div class="question-card">
             <div class="question-header">
-                <div class="question-title">3. Longest Consecutive Sequence</div>
+                <div class="question-title">3. Intersection of Two Vectors</div>
                 <div class="question-points">34 Points</div>
             </div>
             <div class="question-content">
                 <div class="problem-section">
                     <div class="section-title">Problem Statement</div>
                     <div class="question-text">
-                        Given an unsorted array of integers <code>nums</code>, return the length of the longest consecutive elements sequence. You must write an algorithm that runs in O(n) time.
+                        Given two integer vectors <code>nums1</code> and <code>nums2</code>, return a vector of their intersection. Each element in the result must be unique and you may return the result in any order.
                     </div>
                 </div>
 
                 <div class="problem-section">
                     <div class="section-title">Example</div>
                     <div class="example-box">
-                        <strong>Input:</strong> nums = [100,4,200,1,3,2]<br>
-                        <strong>Output:</strong> 4<br>
-                        <strong>Explanation:</strong> The longest consecutive sequence is [1,2,3,4] with length 4.
+                        <strong>Input:</strong> nums1 = [1,2,2,1], nums2 = [2,2]<br>
+                        <strong>Output:</strong> [2]<br>
+                        <strong>Explanation:</strong> Only 2 is common in both arrays.
                     </div>
                 </div>
 
@@ -1179,9 +1180,9 @@
                     <div class="section-title">Constraints</div>
                     <div class="constraints-list">
                         <ul>
-                            <li>0 ≤ nums.length ≤ 10<sup>5</sup></li>
-                            <li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
-                            <li>Algorithm must run in O(n) time complexity</li>
+                            <li>1 ≤ nums1.length, nums2.length ≤ 1000</li>
+                            <li>0 ≤ nums1[i], nums2[i] ≤ 1000</li>
+                            <li>Each element in result must be unique</li>
                         </ul>
                     </div>
                 </div>
@@ -1190,22 +1191,23 @@
                     <div class="section-title">Sample Test Cases</div>
                     <div class="test-cases">
                         <div class="test-case">
-                            <strong>Test 1:</strong> [100,4,200,1,3,2] → 4
+                            <strong>Test 1:</strong> [1,2,2,1] ∩ [2,2] → [2]
                         </div>
                         <div class="test-case">
-                            <strong>Test 2:</strong> [9,1,4,7,3,-1,0,5,8,-1,6] → 7
+                            <strong>Test 2:</strong> [4,9,5] ∩ [9,4,9,8,4] → [4,9] or [9,4]
                         </div>
                         <div class="test-case">
-                            <strong>Test 3:</strong> [1,2,0,1] → 3 (sequence: 0,1,2)
+                            <strong>Test 3:</strong> [1,2,3] ∩ [4,5,6] → []
                         </div>
                     </div>
                 </div>
 
-                <div class="code-signature">int longestConsecutive(vector&lt;int&gt;&amp; nums);</div>
+                <div class="code-signature">vector&lt;int&gt; intersection(vector&lt;int&gt;&amp; nums1, vector&lt;int&gt;&amp; nums2);</div>
                 <div class="code-editor">
-                    <textarea class="code-textarea" id="q3">int longestConsecutive(vector<int>& nums) {
+                    <textarea class="code-textarea" id="q3">vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
     // Implement this function
-    return 0;
+    vector<int> result;
+    return result;
 }</textarea>
                 </div>
                 <div class="question-actions">
@@ -1277,9 +1279,9 @@
         let timer;
 
         const defaultTemplates = {
-            1: `vector<int> productExceptSelf(vector<int>& nums) {\n    // Implement this function\n    vector<int> result(nums.size(), 1);\n    return result;\n}`,
-            2: `int largestZeroSumSubarray(vector<int>& nums) {\n    // Implement this function\n    return 0;\n}`,
-            3: `int longestConsecutive(vector<int>& nums) {\n    // Implement this function\n    return 0;\n}`
+            1: `vector<vector<int>> transpose(vector<vector<int>>& matrix) {\n    // Implement this function\n    vector<vector<int>> result;\n    return result;\n}`,
+            2: `vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`,
+            3: `vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`
         };
 
         // Richa's Special Features - Optimized
@@ -1673,19 +1675,37 @@
             examSecurityActive = true;
             console.log('🔒 Exam security initialized');
             
+            // Enable fullscreen mode
+            enterFullscreen();
+            
             // Disable right-click
             document.addEventListener('contextmenu', e => {
                 e.preventDefault();
                 showToast('warning', 'Action Blocked', 'Right-click is disabled during exam.');
             });
             
-            // Disable F12, Ctrl+Shift+I, Ctrl+U
+            // Disable F12, Ctrl+Shift+I, Ctrl+U, F11, Escape
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'F12' || 
                     (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                    (e.ctrlKey && e.key === 'u')) {
+                    (e.ctrlKey && e.key === 'u') ||
+                    e.key === 'F11' ||
+                    e.key === 'Escape') {
                     e.preventDefault();
-                    showToast('warning', 'Action Blocked', 'Developer tools are disabled during exam.');
+                    if (e.key === 'F11' || e.key === 'Escape') {
+                        showToast('warning', 'Fullscreen Required', 'Please stay in fullscreen mode during exam.');
+                        enterFullscreen();
+                    } else {
+                        showToast('warning', 'Action Blocked', 'Developer tools are disabled during exam.');
+                    }
+                }
+            });
+            
+            // Monitor fullscreen changes
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement && examSecurityActive) {
+                    showToast('warning', 'Fullscreen Required', 'Returning to fullscreen mode...');
+                    setTimeout(() => enterFullscreen(), 1000);
                 }
             });
             
@@ -2205,7 +2225,25 @@
             });
         }
         
+        function enterFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen request failed:', err);
+                    showToast('warning', 'Fullscreen Failed', 'Please manually enter fullscreen mode (F11)');
+                });
+            }
+        }
+        
+        function exitFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+        
         function showSuccessOverlay(data) {
+            // Exit fullscreen when exam is complete
+            exitFullscreen();
+            
             const overlay = document.createElement('div');
             overlay.className = 'success-overlay';
             overlay.style.display = 'flex';

@@ -164,28 +164,28 @@ try {
 // --- Test Cases ---
 const testCases = {
   1: [
-    // Q1: Count Elements Greater Than All Previous
-    { input: [7, 4, 8, 2, 9], expected: "3", points: 7 },
-    { input: [1, 2, 3, 4, 5], expected: "5", points: 7 },
-    { input: [5, 4, 3, 2, 1], expected: "1", points: 6 },
-    { input: [10, 10, 10, 10], expected: "1", points: 7 },
-    { input: [3, 1, 4, 2, 5, 9, 7], expected: "4", points: 6 },
+    // Q1: Transpose of Matrix
+    { input: [[1,2,3],[4,5,6]], expected: "1 4\n2 5\n3 6", points: 7 },
+    { input: [[1,2],[3,4],[5,6]], expected: "1 3 5\n2 4 6", points: 7 },
+    { input: [[1]], expected: "1", points: 6 },
+    { input: [[1,2,3],[4,5,6],[7,8,9]], expected: "1 4 7\n2 5 8\n3 6 9", points: 7 },
+    { input: [[1,2,3,4]], expected: "1\n2\n3\n4", points: 6 },
   ],
   2: [
-    // Q2: Row with Maximum 1's
-    { input: [[0,1,0],[1,1,0],[1,1,1]], expected: "3", points: 7 },
-    { input: [[0,0,0],[0,0,0],[0,0,0]], expected: "1", points: 7 },
-    { input: [[1,0],[1,1],[0,1]], expected: "2", points: 6 },
-    { input: [[1,1,1],[1,0,0],[0,1,0]], expected: "1", points: 7 },
-    { input: [[0,1],[0,1],[1,1]], expected: "3", points: 6 },
+    // Q2: Merge Two Sorted Arrays
+    { input: {nums1: [1,2,3], nums2: [2,5,6]}, expected: "1 2 2 3 5 6", points: 7 },
+    { input: {nums1: [1], nums2: []}, expected: "1", points: 7 },
+    { input: {nums1: [], nums2: [1]}, expected: "1", points: 6 },
+    { input: {nums1: [1,3,5], nums2: [2,4,6]}, expected: "1 2 3 4 5 6", points: 7 },
+    { input: {nums1: [4,5,6], nums2: [1,2,3]}, expected: "1 2 3 4 5 6", points: 6 },
   ],
   3: [
-    // Q3: Move Zeros to End
-    { input: [4,5,0,1,9,0,5,0], expected: "4 5 1 9 5 0 0 0", points: 7 },
-    { input: [0,0,0,0], expected: "0 0 0 0", points: 7 },
-    { input: [1,2,3,4], expected: "1 2 3 4", points: 7 },
-    { input: [0,1,0,2,0,3,0,4], expected: "1 2 3 4 0 0 0 0", points: 6 },
-    { input: [5], expected: "5", points: 7 },
+    // Q3: Intersection of Two Vectors
+    { input: {nums1: [1,2,2,1], nums2: [2,2]}, expected: "2", points: 7 },
+    { input: {nums1: [4,9,5], nums2: [9,4,9,8,4]}, expected: "4 9", points: 7 },
+    { input: {nums1: [1,2,3], nums2: [4,5,6]}, expected: "", points: 6 },
+    { input: {nums1: [1,2,3,4], nums2: [3,4,5,6]}, expected: "3 4", points: 7 },
+    { input: {nums1: [1], nums2: [1,1]}, expected: "1", points: 6 },
   ],
 };
 
@@ -229,12 +229,8 @@ function autoGrade(studentName, answers) {
           };
         }
 
-        const questionMaxScore = tests.reduce((sum, test) => sum + test.points, 0);
-        maxScore += questionMaxScore;
-
         try {
           const result = await compilerPool.compile(qNum, answers[qNum], studentName);
-          totalScore += result.score;
           return { qNum, ...result };
         } catch (error) {
           console.error(`Compilation error for Q${qNum}:`, error.message);
@@ -249,10 +245,15 @@ function autoGrade(studentName, answers) {
 
       const compilationResults = await Promise.all(compilationPromises);
       
-      // Organize results by question number with optimization data
+      // Calculate scores and organize results
       compilationResults.forEach(result => {
+        totalScore += result.score || 0;
+        const tests = testCases[result.qNum];
+        if (tests) {
+          maxScore += tests.reduce((sum, test) => sum + test.points, 0);
+        }
         results[result.qNum] = {
-          score: result.score,
+          score: result.score || 0,
           error: result.error,
           tests: result.tests || [],
           complexity: result.complexity || 'O(n)',
@@ -329,20 +330,23 @@ function createFullCode(qNum, studentCode) {
   };
 
   const functionNames = {
-    1: "countGreaterThanPrior",
-    2: "rowWithMaxOnes",
-    3: "moveZerosToEnd",
+    1: "transpose",
+    2: "mergeSortedArrays",
+    3: "intersection",
   };
 
   const defaultImplementations = {
-    1: `int countGreaterThanPrior(const vector<int>& arr) {
-    return 0; // Default implementation
+    1: `vector<vector<int>> transpose(vector<vector<int>>& matrix) {
+    vector<vector<int>> result;
+    return result; // Default implementation
 }`,
-    2: `int rowWithMaxOnes(const vector<vector<int>>& matrix) {
-    return 0; // Default implementation
+    2: `vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+    vector<int> result;
+    return result; // Default implementation
 }`,
-    3: `void moveZerosToEnd(vector<int>& arr) {
-    // Default implementation - do nothing
+    3: `vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+    vector<int> result;
+    return result; // Default implementation
 }`,
   };
 
@@ -355,87 +359,33 @@ using namespace std;`,
 using namespace std;`,
     3: `#include <iostream>
 #include <vector>
+#include <unordered_set>
 using namespace std;`,
   };
 
   const mainFunctions = {
     1: `int main() {
-    vector<int> arr1 = {7,4,8,2,9};
-    cout << countGreaterThanPrior(arr1) << endl;
-    
-    vector<int> arr2 = {1,2,3,4,5};
-    cout << countGreaterThanPrior(arr2) << endl;
-    
-    vector<int> arr3 = {5,4,3,2,1};
-    cout << countGreaterThanPrior(arr3) << endl;
-    
-    vector<int> arr4 = {10,10,10,10};
-    cout << countGreaterThanPrior(arr4) << endl;
-    
-    vector<int> arr5 = {3,1,4,2,5,9,7};
-    cout << countGreaterThanPrior(arr5) << endl;
-    
+    vector<vector<int>> m1={{1,2,3},{4,5,6}}; auto r1=transpose(m1); for(int i=0;i<r1.size();i++){for(int j=0;j<r1[i].size();j++){cout<<r1[i][j];if(j<r1[i].size()-1)cout<<" ";} if(i<r1.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m2={{1,2},{3,4},{5,6}}; auto r2=transpose(m2); for(int i=0;i<r2.size();i++){for(int j=0;j<r2[i].size();j++){cout<<r2[i][j];if(j<r2[i].size()-1)cout<<" ";} if(i<r2.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m3={{1}}; auto r3=transpose(m3); for(int i=0;i<r3.size();i++){for(int j=0;j<r3[i].size();j++){cout<<r3[i][j];if(j<r3[i].size()-1)cout<<" ";} if(i<r3.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m4={{1,2,3},{4,5,6},{7,8,9}}; auto r4=transpose(m4); for(int i=0;i<r4.size();i++){for(int j=0;j<r4[i].size();j++){cout<<r4[i][j];if(j<r4[i].size()-1)cout<<" ";} if(i<r4.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m5={{1,2,3,4}}; auto r5=transpose(m5); for(int i=0;i<r5.size();i++){for(int j=0;j<r5[i].size();j++){cout<<r5[i][j];if(j<r5[i].size()-1)cout<<" ";} if(i<r5.size()-1)cout<<"\\n";} cout<<endl;
     return 0;
 }`,
     2: `int main() {
-    vector<vector<int>> matrix1 = {{0,1,0},{1,1,0},{1,1,1}};
-    cout << rowWithMaxOnes(matrix1) << endl;
-    
-    vector<vector<int>> matrix2 = {{0,0,0},{0,0,0},{0,0,0}};
-    cout << rowWithMaxOnes(matrix2) << endl;
-    
-    vector<vector<int>> matrix3 = {{1,0},{1,1},{0,1}};
-    cout << rowWithMaxOnes(matrix3) << endl;
-    
-    vector<vector<int>> matrix4 = {{1,1,1},{1,0,0},{0,1,0}};
-    cout << rowWithMaxOnes(matrix4) << endl;
-    
-    vector<vector<int>> matrix5 = {{0,1},{0,1},{1,1}};
-    cout << rowWithMaxOnes(matrix5) << endl;
-    
+    vector<int> a1={1,2,3},b1={2,5,6}; auto r1=mergeSortedArrays(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a2={1},b2={}; auto r2=mergeSortedArrays(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a3={},b3={1}; auto r3=mergeSortedArrays(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a4={1,3,5},b4={2,4,6}; auto r4=mergeSortedArrays(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a5={4,5,6},b5={1,2,3}; auto r5=mergeSortedArrays(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
     return 0;
 }`,
     3: `int main() {
-    vector<int> arr1 = {4,5,0,1,9,0,5,0};
-    moveZerosToEnd(arr1);
-    for(int i = 0; i < arr1.size(); i++) {
-        cout << arr1[i];
-        if(i < arr1.size()-1) cout << " ";
-    }
-    cout << endl;
-    
-    vector<int> arr2 = {0,0,0,0};
-    moveZerosToEnd(arr2);
-    for(int i = 0; i < arr2.size(); i++) {
-        cout << arr2[i];
-        if(i < arr2.size()-1) cout << " ";
-    }
-    cout << endl;
-    
-    vector<int> arr3 = {1,2,3,4};
-    moveZerosToEnd(arr3);
-    for(int i = 0; i < arr3.size(); i++) {
-        cout << arr3[i];
-        if(i < arr3.size()-1) cout << " ";
-    }
-    cout << endl;
-    
-    vector<int> arr4 = {0,1,0,2,0,3,0,4};
-    moveZerosToEnd(arr4);
-    for(int i = 0; i < arr4.size(); i++) {
-        cout << arr4[i];
-        if(i < arr4.size()-1) cout << " ";
-    }
-    cout << endl;
-    
-    vector<int> arr5 = {5};
-    moveZerosToEnd(arr5);
-    for(int i = 0; i < arr5.size(); i++) {
-        cout << arr5[i];
-        if(i < arr5.size()-1) cout << " ";
-    }
-    cout << endl;
-    
+    vector<int> a1={1,2,2,1},b1={2,2}; auto r1=intersection(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a2={4,9,5},b2={9,4,9,8,4}; auto r2=intersection(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a3={1,2,3},b3={4,5,6}; auto r3=intersection(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a4={1,2,3,4},b4={3,4,5,6}; auto r4=intersection(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a5={1},b5={1,1}; auto r5=intersection(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
     return 0;
 }`,
   };
@@ -497,14 +447,13 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
   }
 
   try {
-    // Check for duplicate submission
-    const existingResults = await db.getResults();
-    const duplicate = existingResults.find(r => r.rollNumber === rollNumber);
-    if (duplicate) {
+    // Check for duplicate submission efficiently
+    const existingSubmission = await db.checkExistingSubmission(rollNumber);
+    if (existingSubmission) {
       return res.status(409).json({
         error: "Duplicate submission",
         details: "This student has already submitted",
-        existing: duplicate
+        existing: existingSubmission
       });
     }
 
@@ -604,13 +553,12 @@ app.get("/api/results", async (req, res) => {
 app.post("/api/check-submission", async (req, res) => {
   const { rollNumber } = req.body;
   
-  if (!rollNumber) {
-    return res.status(400).json({ error: "Roll number is required" });
+  if (!rollNumber || !rollNumber.match(/^25MCS[AS]\d{2}$/)) {
+    return res.status(400).json({ error: "Valid roll number is required" });
   }
   
   try {
-    const results = await db.getResults();
-    const existingSubmission = results.find(r => r.rollNumber === rollNumber);
+    const existingSubmission = await db.checkExistingSubmission(rollNumber);
     
     if (existingSubmission) {
       res.json({
@@ -676,6 +624,14 @@ app.delete("/api/results/clear", async (req, res) => {
 app.delete("/api/results/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    if (!id || isNaN(parseInt(id))) {
+      return res.status(400).json({ 
+        error: "Invalid ID", 
+        details: "ID must be a valid number" 
+      });
+    }
+    
     const result = await db.deleteResult(id);
     res.json({
       success: true,

@@ -13,40 +13,25 @@ if (!fs.existsSync(submissionDir)) {
 
 const testCases = {
   1: [
-    { input: [1,2,3,4], expected: "24 12 8 6", points: 10 },
-    { input: [2,0,4], expected: "0 8 0", points: 10 },
-    { input: [1,1,1,1], expected: "1 1 1 1", points: 10 },
-    { input: [0,0,0,0], expected: "0 0 0 0", points: 10 },
-    { input: [-1,1,0,-3,3], expected: "0 0 9 0 0", points: 10 },
-    { input: [-2,-3,-4], expected: "12 8 6", points: 10 },
-    { input: [5,0], expected: "0 5", points: 10 },
-    { input: [30,-30], expected: "-30 30", points: 10 },
-    { input: Array(1000).fill(1), expected: Array(1000).fill(1).join(' '), points: 10 },
-    { input: Array(2000).fill(2), expected: Array(2000).fill(2).join(' '), points: 10 },
+    { input: [[1,2,3],[4,5,6]], expected: "1 4\n2 5\n3 6", points: 7 },
+    { input: [[1,2],[3,4],[5,6]], expected: "1 3 5\n2 4 6", points: 7 },
+    { input: [[1]], expected: "1", points: 6 },
+    { input: [[1,2,3],[4,5,6],[7,8,9]], expected: "1 4 7\n2 5 8\n3 6 9", points: 7 },
+    { input: [[1,2,3,4]], expected: "1\n2\n3\n4", points: 6 },
   ],
   2: [
-    { input: [15,-2,2,-8,1,7,10,23], expected: "5", points: 10 },
-    { input: [1,2,3,4,5], expected: "0", points: 10 },
-    { input: [1,2,-3,3], expected: "3", points: 10 },
-    { input: [1,-1], expected: "2", points: 10 },
-    { input: [0,0,0,0], expected: "4", points: 10 },
-    { input: [1,0,-1,0,1], expected: "4", points: 10 },
-    { input: [-1,2,-3,4,-5,6], expected: "4", points: 10 },
-    { input: Array(1000).fill(0), expected: "1000", points: 10 },
-    { input: Array.from({length: 5000}, (_, i) => i % 2 === 0 ? 1 : -1), expected: "5000", points: 10 },
-    { input: Array.from({length: 10000}, (_, i) => Math.random() > 0.5 ? 1000000000 : -1000000000), expected: "10000", points: 10 },
+    { input: {nums1: [1,2,3], nums2: [2,5,6]}, expected: "1 2 2 3 5 6", points: 7 },
+    { input: {nums1: [1], nums2: []}, expected: "1", points: 7 },
+    { input: {nums1: [], nums2: [1]}, expected: "1", points: 6 },
+    { input: {nums1: [1,3,5], nums2: [2,4,6]}, expected: "1 2 3 4 5 6", points: 7 },
+    { input: {nums1: [4,5,6], nums2: [1,2,3]}, expected: "1 2 3 4 5 6", points: 6 },
   ],
   3: [
-    { input: [100,4,200,1,3,2], expected: "4", points: 10 },
-    { input: [9,1,4,7,3,-1,0,5,8,-1,6], expected: "7", points: 10 },
-    { input: [1,2,0,1], expected: "3", points: 10 },
-    { input: [5,6,7,8,9], expected: "5", points: 10 },
-    { input: [], expected: "0", points: 10 },
-    { input: [0,0,0,0], expected: "1", points: 10 },
-    { input: [-1000000000,1000000000], expected: "1", points: 10 },
-    { input: Array.from({length: 1000}, (_, i) => i), expected: "1000", points: 10 },
-    { input: Array.from({length: 5000}, (_, i) => i * 2), expected: "1", points: 10 },
-    { input: Array.from({length: 10000}, (_, i) => Math.floor(Math.random() * 2000000000) - 1000000000), expected: "1", points: 10 },
+    { input: {nums1: [1,2,2,1], nums2: [2,2]}, expected: "2", points: 7 },
+    { input: {nums1: [4,9,5], nums2: [9,4,9,8,4]}, expected: "4 9", points: 7 },
+    { input: {nums1: [1,2,3], nums2: [4,5,6]}, expected: "", points: 6 },
+    { input: {nums1: [1,2,3,4], nums2: [3,4,5,6]}, expected: "3 4", points: 7 },
+    { input: {nums1: [1], nums2: [1,1]}, expected: "1", points: 6 },
   ],
 };
 
@@ -58,115 +43,40 @@ const limitedTestCases = {
 
 function createFullCode(qNum, studentCode) {
   const functionNames = {
-    1: "productExceptSelf",
-    2: "largestZeroSumSubarray",
-    3: "longestConsecutive",
+    1: "transpose",
+    2: "mergeSortedArrays",
+    3: "intersection",
   };
 
   const headers = {
-    1: `#include <iostream>\n#include <vector>\n#include <ios>\nusing namespace std;`,
-    2: `#include <iostream>\n#include <vector>\n#include <unordered_map>\n#include <ios>\nusing namespace std;`,
-    3: `#include <iostream>\n#include <vector>\n#include <unordered_set>\n#include <algorithm>\n#include <cstdlib>\n#include <ios>\nusing namespace std;`,
+    1: `#include <iostream>\n#include <vector>\nusing namespace std;`,
+    2: `#include <iostream>\n#include <vector>\nusing namespace std;`,
+    3: `#include <iostream>\n#include <vector>\n#include <unordered_set>\nusing namespace std;`,
   };
 
   const mainFunctions = {
     1: `int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    vector<vector<int>> testCases = {
-        {1,2,3,4},
-        {2,0,4},
-        {1,1,1,1},
-        {0,0,0,0},
-        {-1,1,0,-3,3},
-        {-2,-3,-4},
-        {5,0},
-        {30,-30},
-        vector<int>(1000, 1),
-        vector<int>(2000, 2)
-    };
-    
-    for(auto& arr : testCases) {
-        vector<int> result = productExceptSelf(arr);
-        for(int i = 0; i < result.size(); i++) {
-            cout << result[i];
-            if(i < result.size()-1) cout << " ";
-        }
-        cout << endl;
-    }
-    
+    vector<vector<int>> m1={{1,2,3},{4,5,6}}; auto r1=transpose(m1); for(int i=0;i<r1.size();i++){for(int j=0;j<r1[i].size();j++){cout<<r1[i][j];if(j<r1[i].size()-1)cout<<" ";} if(i<r1.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m2={{1,2},{3,4},{5,6}}; auto r2=transpose(m2); for(int i=0;i<r2.size();i++){for(int j=0;j<r2[i].size();j++){cout<<r2[i][j];if(j<r2[i].size()-1)cout<<" ";} if(i<r2.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m3={{1}}; auto r3=transpose(m3); for(int i=0;i<r3.size();i++){for(int j=0;j<r3[i].size();j++){cout<<r3[i][j];if(j<r3[i].size()-1)cout<<" ";} if(i<r3.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m4={{1,2,3},{4,5,6},{7,8,9}}; auto r4=transpose(m4); for(int i=0;i<r4.size();i++){for(int j=0;j<r4[i].size();j++){cout<<r4[i][j];if(j<r4[i].size()-1)cout<<" ";} if(i<r4.size()-1)cout<<"\\n";} cout<<endl;
+    vector<vector<int>> m5={{1,2,3,4}}; auto r5=transpose(m5); for(int i=0;i<r5.size();i++){for(int j=0;j<r5[i].size();j++){cout<<r5[i][j];if(j<r5[i].size()-1)cout<<" ";} if(i<r5.size()-1)cout<<"\\n";} cout<<endl;
     return 0;
 }`,
     2: `int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    vector<vector<int>> testCases = {
-        {15,-2,2,-8,1,7,10,23},
-        {1,2,3,4,5},
-        {1,2,-3,3},
-        {1,-1},
-        {0,0,0,0},
-        {1,0,-1,0,1},
-        {-1,2,-3,4,-5,6},
-        vector<int>(1000, 0),
-        vector<int>(5000),
-        vector<int>(10000)
-    };
-    
-    // Fill alternating pattern for test case 9
-    for(int i = 0; i < 5000; i++) {
-        testCases[8][i] = (i % 2 == 0) ? 1 : -1;
-    }
-    
-    // Fill random large values for test case 10
-    for(int i = 0; i < 10000; i++) {
-        testCases[9][i] = (i % 2 == 0) ? 1000000000 : -1000000000;
-    }
-    
-    for(auto& arr : testCases) {
-        cout << largestZeroSumSubarray(arr) << endl;
-    }
-    
+    vector<int> a1={1,2,3},b1={2,5,6}; auto r1=mergeSortedArrays(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a2={1},b2={}; auto r2=mergeSortedArrays(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a3={},b3={1}; auto r3=mergeSortedArrays(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a4={1,3,5},b4={2,4,6}; auto r4=mergeSortedArrays(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a5={4,5,6},b5={1,2,3}; auto r5=mergeSortedArrays(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
     return 0;
 }`,
     3: `int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    vector<vector<int>> testCases = {
-        {100,4,200,1,3,2},
-        {9,1,4,7,3,-1,0,5,8,-1,6},
-        {1,2,0,1},
-        {5,6,7,8,9},
-        {},
-        {0,0,0,0},
-        {-1000000000,1000000000},
-        vector<int>(1000),
-        vector<int>(5000),
-        vector<int>(10000)
-    };
-    
-    // Fill consecutive sequence for test case 8
-    for(int i = 0; i < 1000; i++) {
-        testCases[7][i] = i;
-    }
-    
-    // Fill non-consecutive for test case 9
-    for(int i = 0; i < 5000; i++) {
-        testCases[8][i] = i * 2;
-    }
-    
-    // Fill random for test case 10
-    for(int i = 0; i < 10000; i++) {
-        testCases[9][i] = rand() % 2000000000 - 1000000000;
-    }
-    
-    for(auto& arr : testCases) {
-        cout << longestConsecutive(arr) << endl;
-    }
-    
+    vector<int> a1={1,2,2,1},b1={2,2}; auto r1=intersection(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a2={4,9,5},b2={9,4,9,8,4}; auto r2=intersection(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a3={1,2,3},b3={4,5,6}; auto r3=intersection(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a4={1,2,3,4},b4={3,4,5,6}; auto r4=intersection(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
+    vector<int> a5={1},b5={1,1}; auto r5=intersection(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
     return 0;
 }`,
   };

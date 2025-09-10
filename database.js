@@ -80,7 +80,7 @@ const saveResult = (result) => {
       result.codingMaxScore || 75,
       result.mcqScore || 0,
       result.mcqMaxScore || 25,
-      (result.totalScore / result.maxScore) * 100,
+      result.maxScore > 0 ? (result.totalScore / result.maxScore) * 100 : 0,
       JSON.stringify(result.results || {}),
       JSON.stringify(result.mcqResults || {}),
       JSON.stringify(result.submittedCode || {}),
@@ -199,12 +199,41 @@ const deleteResult = (id) => {
   });
 };
 
+// Efficient duplicate check function
+const checkExistingSubmission = (rollNumber) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM results WHERE rollNumber = ? LIMIT 1";
+    db.get(sql, [rollNumber], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (row) {
+          try {
+            resolve({
+              ...row,
+              name: row.studentName,
+              results: JSON.parse(row.results || "{}"),
+              mcqResults: JSON.parse(row.mcqResults || "{}"),
+              submittedCode: JSON.parse(row.submittedCode || "{}"),
+            });
+          } catch (parseError) {
+            reject(parseError);
+          }
+        } else {
+          resolve(null);
+        }
+      }
+    });
+  });
+};
+
 module.exports = {
   saveResult: (result) => {
     clearResultsCache();
     return saveResult(result);
   },
   getResults,
+  checkExistingSubmission,
   clearResults: () => {
     clearResultsCache();
     return clearResults();
