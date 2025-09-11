@@ -10,6 +10,10 @@ submissions/temp_*
 db/*.backup
 db/*.bak
 
+# SQLite temporary files
+db/*.db-shm
+db/*.db-wal
+
 # Logs
 *.log
 
