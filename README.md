@@ -7,7 +7,7 @@
 ![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-*A modern, full-featured automated coding assessment system with real-time grading and beautiful UI*
+_A modern, full-featured automated coding assessment system with real-time grading and beautiful UI_
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
 
@@ -18,29 +18,34 @@
 ## ✨ Features
 
 ### 🔐 **Advanced Authentication System**
+
 - **Roll Number Validation**: Secure student verification with predefined roll numbers
 - **One-Time Submission**: Prevents multiple submissions per student
 - **Session Management**: Automatic session handling with backup recovery
 
 ### 🤖 **Intelligent Auto-Grading**
+
 - **Real-time Compilation**: Automatic C++ code compilation and execution
 - **Test Case Validation**: Comprehensive test case evaluation with detailed feedback
-- **MCQ Assessment**: Multiple choice questions with instant scoring
+- **Coding Assessment**: Three algorithmic programming challenges
 - **Partial Credit**: Fair scoring system with partial points for test cases
 
 ### 🎨 **Modern User Interface**
+
 - **Glassmorphism Design**: Beautiful, modern UI with gradient backgrounds
 - **Responsive Layout**: Mobile-friendly design that works on all devices
 - **Syntax Highlighting**: Code editor with syntax highlighting using Prism.js
 - **Real-time Feedback**: Instant validation and error messages
 
 ### 👨‍💼 **Admin Dashboard**
+
 - **Results Management**: Comprehensive admin panel for viewing all submissions
 - **Export Functionality**: Easy export of results for further analysis
 - **Database Management**: Built-in tools for database operations
 - **Real-time Monitoring**: Live view of student submissions
 
 ### 🛡️ **Security & Reliability**
+
 - **Rate Limiting**: Protection against spam submissions
 - **Input Validation**: Comprehensive server-side validation
 - **Error Handling**: Robust error handling with user-friendly messages
@@ -49,34 +54,40 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/theatulgupta/CodeAssess.git
 cd CodeAssess
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 ```
 
 3. **Start the development server**
+
 ```bash
 npm run dev
 ```
 
 4. **Access the application**
+
 - **Student Interface**: `http://localhost:3000`
 - **Admin Panel**: `http://localhost:3000/admin.html`
 
 ## 📋 Available Commands
 
 ### 🔧 **Development & Server Management**
+
 ```bash
 # Start development server with auto-reload
 npm run dev
@@ -86,6 +97,7 @@ npm start
 ```
 
 ### 🗃️ **Database Management**
+
 ```bash
 # Clear all exam results (with confirmation)
 npm run clear-db
@@ -99,16 +111,23 @@ npm run db-status
 ### For Instructors/Admins
 
 1. **🧹 Clear Previous Data**
+
    ```bash
    npm run clear-db
    ```
+   
+   ⚠️ **Important**: This only clears the database. For completely fresh exams, ask students to:
+   - Use incognito/private browsing mode, OR
+   - Access exam with `?fresh=true` parameter: `http://localhost:3000/?fresh=true`
 
 2. **🚀 Start the Server**
+
    ```bash
    npm run dev
    ```
 
 3. **📊 Monitor Progress**
+
    - Visit `http://localhost:3000/admin.html`
    - View real-time submissions and results
 
@@ -120,10 +139,13 @@ npm run db-status
 ### For Students
 
 1. **🌐 Access the Exam**
-   - Visit `http://localhost:3000`
+
+   - Visit `http://localhost:3000` (or `http://localhost:3000/?fresh=true` for fresh start)
    - Enter valid roll number (format: 25MCSXXX)
+   - **For completely fresh exam**: Use incognito/private browsing mode
 
 2. **✍️ Complete Assessment**
+
    - Solve coding problems in the provided editor
    - Answer multiple choice questions
    - Submit once completed
@@ -153,6 +175,7 @@ CodeAssess/
 ## 🔧 Configuration
 
 ### Student Database
+
 Students are pre-configured in `server.js`. To add/modify students:
 
 ```javascript
@@ -163,23 +186,25 @@ const students = {
 };
 ```
 
-### MCQ Questions
-Multiple choice questions can be configured in `index.html`:
+### Programming Questions
 
-```javascript
-const mcqQuestions = {
-  mcq1: { question: "Your question here", options: [...], answer: "A" },
-  // Add more questions...
-};
-```
+The assessment includes three algorithmic programming challenges:
+
+1. **Find the Second Largest Element** - Array manipulation and sorting
+2. **Count Greater Elements than All Previous** - Array traversal and optimization
+3. **Row with Maximum 1s in 2D Vector** - Matrix operations and counting
+
+Test cases and grading logic are defined in `src/services/compilerWorker.js`.
 
 ## 🎨 Screenshots
 
 ### Student Interface
-*Modern, responsive design with glassmorphism effects*
+
+_Modern, responsive design with glassmorphism effects_
 
 ### Admin Dashboard
-*Comprehensive results management with real-time updates*
+
+_Comprehensive results management with real-time updates_
 
 ## 🛠️ Technology Stack
 
@@ -192,11 +217,11 @@ const mcqQuestions = {
 
 ## 🚦 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/submit` | Submit student answers for grading |
-| GET | `/api/results` | Retrieve all exam results (admin) |
-| DELETE | `/api/results/clear` | Clear all results (admin) |
+| Method | Endpoint             | Description                        |
+| ------ | -------------------- | ---------------------------------- |
+| POST   | `/api/submit`        | Submit student answers for grading |
+| GET    | `/api/results`       | Retrieve all exam results (admin)  |
+| DELETE | `/api/results/clear` | Clear all results (admin)          |
 
 ## 🔐 Security Features
 
@@ -220,6 +245,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👤 Author
 
 **Atul Gupta**
+
 - GitHub: [@theatulgupta](https://github.com/theatulgupta)
 - LinkedIn: [Atul Gupta](https://linkedin.com/in/theatulgupta)
 

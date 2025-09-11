@@ -1,2303 +1,3177 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>C++ Programming Assessment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #f8fafc;
+        color: #1e293b;
+        line-height: 1.6;
+      }
 
-        /* Header */
-        .header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+      /* Header */
+      .header {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
 
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .timer-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .timer {
+        background: #dc2626;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #3b82f6;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      /* Auth Modal */
+      .auth-modal {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.1),
+          rgba(16, 185, 129, 0.1)
+        );
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .auth-content {
+        background: white;
+        padding: 3rem;
+        border-radius: 1.5rem;
+        width: 90%;
+        max-width: 480px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.4s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .auth-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
+      }
+
+      .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #1e293b;
+        position: relative;
+      }
+
+      .auth-title::after {
+        content: "";
+        position: absolute;
+        bottom: -0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        border-radius: 2px;
+      }
+
+      .student-verification {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin: 2rem 0;
+        text-align: center;
+        display: none;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(-20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .student-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+      }
+
+      .student-roll {
+        color: #3b82f6;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        font-family: "SF Mono", Monaco, monospace;
+        background: rgba(59, 130, 246, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: inline-block;
+      }
+
+      .verification-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border-left: 4px solid;
+        z-index: 2000;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        max-width: 400px;
+      }
+
+      .toast.show {
+        transform: translateX(0);
+      }
+
+      .toast-success {
+        border-left-color: #10b981;
+      }
+
+      .toast-error {
+        border-left-color: #ef4444;
+      }
+
+      .toast-warning {
+        border-left-color: #f59e0b;
+      }
+
+      .toast-info {
+        border-left-color: #3b82f6;
+      }
+
+      .toast-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .toast-body {
+        color: #64748b;
+        font-size: 0.875rem;
+      }
+
+      .form-input {
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .form-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+      }
+
+      .btn {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+      }
+
+      .btn-primary {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2563eb;
+      }
+
+      .btn-success {
+        background: #10b981;
+        color: white;
+      }
+
+      .btn-success:hover {
+        background: #059669;
+      }
+
+      .btn-secondary {
+        background: #6b7280;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #4b5563;
+      }
+
+      /* Main Content */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+      }
+
+      .exam-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+      }
+
+      .student-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .welcome-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .exam-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 0.5rem;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3b82f6;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Question Card */
+      .question-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        margin-bottom: 2rem;
+        overflow: hidden;
+      }
+
+      .question-header {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .question-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+      }
+
+      .question-points {
+        background: #3b82f6;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .question-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .difficulty-tag {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .difficulty-tag.easy {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .difficulty-tag.medium {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .difficulty-tag.hard {
+        background: #fecaca;
+        color: #991b1b;
+      }
+
+      .question-tags {
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .company-tag {
+        background: #ede9fe;
+        color: #6b21a8;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .topic-tag {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .question-content {
+        padding: 1.5rem;
+      }
+
+      .question-text {
+        margin-bottom: 1.5rem;
+        color: #374151;
+        line-height: 1.6;
+      }
+
+      .problem-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .section-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .example-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.75rem 0;
+        font-family: "SF Mono", Monaco, monospace;
+        font-size: 0.875rem;
+      }
+
+      .constraints-list {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.75rem 0;
+      }
+
+      .constraints-list ul {
+        margin: 0;
+        padding-left: 1.25rem;
+      }
+
+      .constraints-list li {
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+        color: #92400e;
+      }
+
+      .test-cases {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.75rem 0;
+      }
+
+      .test-case {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 0.375rem;
+        font-family: "SF Mono", Monaco, monospace;
+        font-size: 0.8rem;
+      }
+
+      .code-signature {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-family: "SF Mono", Monaco, monospace;
+        font-size: 0.875rem;
+        margin: 1rem 0;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .code-editor {
+        margin: 1.5rem 0;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+
+      .code-editor-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+      }
+
+      .code-language {
+        color: #64748b;
+        font-weight: 500;
+      }
+
+      .code-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .code-action-btn {
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+      }
+
+      .code-action-btn:hover {
+        background: #e2e8f0;
+        color: #475569;
+      }
+
+      .code-textarea {
+        width: 100%;
+        height: 300px;
+        padding: 1rem;
+        border: none;
+        border-radius: 0;
+        font-family: "SF Mono", Monaco, monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        background: #1e293b;
+        color: #e2e8f0;
+        resize: vertical;
+      }
+
+      .code-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .question-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-left: auto;
+      }
+
+      .status-empty {
+        background: #ef4444;
+      }
+      .status-modified {
+        background: #f59e0b;
+      }
+      .status-saved {
+        background: #10b981;
+      }
+
+      /* Output Window */
+      .output-window {
+        margin-top: 1rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-family: "SF Mono", Monaco, monospace;
+        font-size: 0.875rem;
+        color: #e2e8f0;
+        display: none;
+      }
+
+      .output-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #334155;
+      }
+
+      .test-result {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        border-left: 3px solid;
+      }
+
+      .test-pass {
+        background: rgba(16, 185, 129, 0.1);
+        border-left-color: #10b981;
+      }
+
+      .test-fail {
+        background: rgba(239, 68, 68, 0.1);
+        border-left-color: #ef4444;
+      }
+
+      .test-summary {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      /* Submit Section */
+      .submit-section {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .submit-text {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+      }
+
+      .submit-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+      }
+
+      .submit-warning {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #dc2626;
+        font-weight: 500;
+      }
+
+      .btn-submit {
+        background: #dc2626;
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+        min-width: 200px;
+      }
+
+      .btn-submit:hover {
+        background: #b91c1c;
+      }
+
+      .btn-submit:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-submit:disabled:hover {
+        background: #9ca3af;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Loading States */
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 0.5rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Success Overlay */
+      .success-overlay {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.95),
+          rgba(5, 150, 105, 0.95)
+        );
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .success-content {
+        text-align: center;
+        color: white;
+        animation: celebrationBounce 0.8s ease;
+      }
+
+      @keyframes celebrationBounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-20px);
+        }
+        60% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .success-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .success-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .success-message {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+      }
+
+      .success-details {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        backdrop-filter: blur(10px);
+      }
+
+      /* Confetti Animation */
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #fbbf24;
+        animation: confetti-fall 3s linear infinite;
+      }
+
+      .confetti:nth-child(1) {
+        left: 10%;
+        animation-delay: 0s;
+        background: #ef4444;
+      }
+      .confetti:nth-child(2) {
+        left: 20%;
+        animation-delay: 0.2s;
+        background: #3b82f6;
+      }
+      .confetti:nth-child(3) {
+        left: 30%;
+        animation-delay: 0.4s;
+        background: #10b981;
+      }
+      .confetti:nth-child(4) {
+        left: 40%;
+        animation-delay: 0.6s;
+        background: #f59e0b;
+      }
+      .confetti:nth-child(5) {
+        left: 50%;
+        animation-delay: 0.8s;
+        background: #8b5cf6;
+      }
+      .confetti:nth-child(6) {
+        left: 60%;
+        animation-delay: 1s;
+        background: #ef4444;
+      }
+      .confetti:nth-child(7) {
+        left: 70%;
+        animation-delay: 1.2s;
+        background: #3b82f6;
+      }
+      .confetti:nth-child(8) {
+        left: 80%;
+        animation-delay: 1.4s;
+        background: #10b981;
+      }
+      .confetti:nth-child(9) {
+        left: 90%;
+        animation-delay: 1.6s;
+        background: #f59e0b;
+      }
+
+      @keyframes confetti-fall {
+        0% {
+          transform: translateY(-100vh) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      /* Richa's Special Animations */
+      .floating-emoji {
+        position: fixed;
+        font-size: 2rem;
+        pointer-events: none;
+        z-index: 1000;
+        animation: float-up 4s ease-out forwards;
+      }
+
+      @keyframes float-up {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-200px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .sparkle {
+        position: fixed;
+        width: 6px;
+        height: 6px;
+        background: linear-gradient(45deg, #ffd700, #ffed4e);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 999;
+        animation: sparkle 2s ease-out forwards;
+      }
+
+      @keyframes sparkle {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1) rotate(180deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .richa-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        z-index: 1500;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        animation: richa-bounce 3s ease-out forwards;
+      }
+
+      @keyframes richa-bounce {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+        20% {
+          transform: translate(-50%, -50%) scale(1.1);
+          opacity: 1;
+        }
+        40% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        80% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+      }
+
+      /* Richa's Special Background Effects */
+      .richa-bg-hearts {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.1;
+      }
+
+      .floating-heart {
+        position: absolute;
+        font-size: 1.5rem;
+        color: #ff69b4;
+        animation: float-heart 8s infinite ease-in-out;
+      }
+
+      @keyframes float-heart {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 0.3;
+        }
+        50% {
+          transform: translateY(-20px) rotate(10deg);
+          opacity: 0.7;
+        }
+      }
+
+      .richa-header-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff69b4, #ff1493, #dc143c, #ff69b4);
+        background-size: 200% 100%;
+        animation: rainbow-flow 3s linear infinite;
+      }
+
+      @keyframes rainbow-flow {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 200% 50%;
+        }
+      }
+
+      .richa-corner-stars {
+        position: fixed;
+        font-size: 1rem;
+        color: #ffd700;
+        pointer-events: none;
+        z-index: 100;
+        animation: twinkle 2s infinite alternate;
+      }
+
+      @keyframes twinkle {
+        0% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+      }
+
+      .richa-minute-heart {
+        position: fixed;
+        font-size: 2.5rem;
+        color: #ff1493;
+        pointer-events: none;
+        z-index: 1200;
+        animation: heart-pulse 3s ease-out forwards;
+      }
+
+      @keyframes heart-pulse {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        20% {
+          transform: scale(1.2) rotate(10deg);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(1) rotate(-5deg);
+          opacity: 1;
+        }
+        60% {
+          transform: scale(1.1) rotate(5deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+      }
+
+      .richa-waving-hand {
+        position: fixed;
+        top: 20px;
+        right: 100px;
+        font-size: 2rem;
+        pointer-events: none;
+        z-index: 1100;
+        animation: wave-hand 2s ease-in-out;
+      }
+
+      @keyframes wave-hand {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(20deg);
+        }
+        75% {
+          transform: rotate(-20deg);
+        }
+      }
+
+      .richa-progress-hearts {
+        position: absolute;
+        right: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        color: #ff69b4;
+        animation: progress-float 2s ease-in-out infinite;
+      }
+
+      @keyframes progress-float {
+        0%,
+        100% {
+          transform: translateY(-50%) translateX(0);
+        }
+        50% {
+          transform: translateY(-50%) translateX(-10px);
+        }
+      }
+
+      .richa-butterfly {
+        position: fixed;
+        font-size: 1.8rem;
+        pointer-events: none;
+        z-index: 1000;
+        animation: butterfly-fly 8s linear infinite;
+      }
+
+      @keyframes butterfly-fly {
+        0% {
+          transform: translateX(-100px) translateY(0) rotate(0deg);
+        }
+        25% {
+          transform: translateX(25vw) translateY(-50px) rotate(10deg);
+        }
+        50% {
+          transform: translateX(50vw) translateY(0) rotate(-10deg);
+        }
+        75% {
+          transform: translateX(75vw) translateY(-30px) rotate(5deg);
+        }
+        100% {
+          transform: translateX(100vw) translateY(0) rotate(0deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
         .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+          flex-direction: column;
+          gap: 1rem;
         }
 
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .timer-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .timer {
-            background: #dc2626;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .progress-bar {
-            width: 120px;
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #3b82f6;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Auth Modal */
-        .auth-modal {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .auth-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 1.5rem;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .auth-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
-        }
-
-        .auth-title {
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #1e293b;
-            position: relative;
-        }
-
-        .auth-title::after {
-            content: '';
-            position: absolute;
-            bottom: -0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, #3b82f6, #10b981);
-            border-radius: 2px;
-        }
-
-        .student-verification {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            border: 1px solid #e2e8f0;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .student-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-
-        .student-roll {
-            color: #3b82f6;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            font-family: 'SF Mono', Monaco, monospace;
-            background: rgba(59, 130, 246, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            display: inline-block;
-        }
-
-        .verification-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            border-left: 4px solid;
-            z-index: 2000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast-success {
-            border-left-color: #10b981;
-        }
-
-        .toast-error {
-            border-left-color: #ef4444;
-        }
-
-        .toast-warning {
-            border-left-color: #f59e0b;
-        }
-
-        .toast-info {
-            border-left-color: #3b82f6;
-        }
-
-        .toast-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .toast-body {
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        .form-input {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .form-input:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
-        }
-
-        .btn {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4b5563;
-        }
-
-        /* Main Content */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        .exam-header {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 2rem;
-        }
-
-        .student-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .welcome-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .exam-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 0.75rem;
-            background: #f8fafc;
-            border-radius: 0.5rem;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #3b82f6;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Question Card */
-        .question-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .question-header {
-            background: #f8fafc;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .question-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-
-        .question-points {
-            background: #3b82f6;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .question-content {
-            padding: 1.5rem;
-        }
-
-        .question-text {
-            margin-bottom: 1.5rem;
-            color: #374151;
-            line-height: 1.6;
-        }
-
-        .problem-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .example-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin: 0.75rem 0;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.875rem;
-        }
-
-        .constraints-list {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin: 0.75rem 0;
-        }
-
-        .constraints-list ul {
-            margin: 0;
-            padding-left: 1.25rem;
-        }
-
-        .constraints-list li {
-            margin: 0.25rem 0;
-            font-size: 0.875rem;
-            color: #92400e;
-        }
-
-        .test-cases {
-            background: #f0f9ff;
-            border: 1px solid #0ea5e9;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin: 0.75rem 0;
-        }
-
-        .test-case {
-            margin: 0.5rem 0;
-            padding: 0.5rem;
-            background: white;
-            border-radius: 0.375rem;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.8rem;
-        }
-
-        .code-signature {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.875rem;
-            margin: 1rem 0;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .code-editor {
-            margin: 1.5rem 0;
-        }
-
-        .code-textarea {
-            width: 100%;
-            height: 300px;
-            padding: 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            background: #1e293b;
-            color: #e2e8f0;
-            resize: vertical;
-        }
-
-        .code-textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          padding: 1rem;
         }
 
         .question-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
+          flex-direction: column;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-left: auto;
+        .btn {
+          width: 100%;
         }
-
-        .status-empty { background: #ef4444; }
-        .status-modified { background: #f59e0b; }
-        .status-saved { background: #10b981; }
-
-        /* Output Window */
-        .output-window {
-            margin-top: 1rem;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.875rem;
-            color: #e2e8f0;
-            display: none;
-        }
-
-        .output-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #334155;
-        }
-
-        .test-result {
-            margin: 0.75rem 0;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            border-left: 3px solid;
-        }
-
-        .test-pass {
-            background: rgba(16, 185, 129, 0.1);
-            border-left-color: #10b981;
-        }
-
-        .test-fail {
-            background: rgba(239, 68, 68, 0.1);
-            border-left-color: #ef4444;
-        }
-
-        .test-summary {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        /* Submit Section */
-        .submit-section {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .submit-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .submit-text {
-            color: #64748b;
-            margin-bottom: 2rem;
-        }
-
-        .btn-submit {
-            background: #dc2626;
-            color: white;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-            min-width: 200px;
-        }
-
-        .btn-submit:hover {
-            background: #b91c1c;
-        }
-
-        .btn-submit:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-submit:disabled:hover {
-            background: #9ca3af;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Loading States */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 0.5rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Success Overlay */
-        .success-overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .success-content {
-            text-align: center;
-            color: white;
-            animation: celebrationBounce 0.8s ease;
-        }
-
-        @keyframes celebrationBounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-20px); }
-            60% { transform: translateY(-10px); }
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .success-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .success-message {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-
-        .success-details {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Confetti Animation */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #fbbf24;
-            animation: confetti-fall 3s linear infinite;
-        }
-
-        .confetti:nth-child(1) { left: 10%; animation-delay: 0s; background: #ef4444; }
-        .confetti:nth-child(2) { left: 20%; animation-delay: 0.2s; background: #3b82f6; }
-        .confetti:nth-child(3) { left: 30%; animation-delay: 0.4s; background: #10b981; }
-        .confetti:nth-child(4) { left: 40%; animation-delay: 0.6s; background: #f59e0b; }
-        .confetti:nth-child(5) { left: 50%; animation-delay: 0.8s; background: #8b5cf6; }
-        .confetti:nth-child(6) { left: 60%; animation-delay: 1s; background: #ef4444; }
-        .confetti:nth-child(7) { left: 70%; animation-delay: 1.2s; background: #3b82f6; }
-        .confetti:nth-child(8) { left: 80%; animation-delay: 1.4s; background: #10b981; }
-        .confetti:nth-child(9) { left: 90%; animation-delay: 1.6s; background: #f59e0b; }
-
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* Richa's Special Animations */
-        .floating-emoji {
-            position: fixed;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 1000;
-            animation: float-up 4s ease-out forwards;
-        }
-
-        @keyframes float-up {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-200px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .sparkle {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 999;
-            animation: sparkle 2s ease-out forwards;
-        }
-
-        @keyframes sparkle {
-            0% {
-                transform: scale(0) rotate(0deg);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1) rotate(180deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .richa-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            z-index: 1500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: richa-bounce 3s ease-out forwards;
-        }
-
-        @keyframes richa-bounce {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-        }
-
-        /* Richa's Special Background Effects */
-        .richa-bg-hearts {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.1;
-        }
-
-        .floating-heart {
-            position: absolute;
-            font-size: 1.5rem;
-            color: #ff69b4;
-            animation: float-heart 8s infinite ease-in-out;
-        }
-
-        @keyframes float-heart {
-            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-20px) rotate(10deg); opacity: 0.7; }
-        }
-
-        .richa-header-decoration {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff69b4, #ff1493, #dc143c, #ff69b4);
-            background-size: 200% 100%;
-            animation: rainbow-flow 3s linear infinite;
-        }
-
-        @keyframes rainbow-flow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-
-        .richa-corner-stars {
-            position: fixed;
-            font-size: 1rem;
-            color: #ffd700;
-            pointer-events: none;
-            z-index: 100;
-            animation: twinkle 2s infinite alternate;
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
-        }
-
-        .richa-minute-heart {
-            position: fixed;
-            font-size: 2.5rem;
-            color: #ff1493;
-            pointer-events: none;
-            z-index: 1200;
-            animation: heart-pulse 3s ease-out forwards;
-        }
-
-        @keyframes heart-pulse {
-            0% { transform: scale(0) rotate(0deg); opacity: 0; }
-            20% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-             40% { transform: scale(1) rotate(-5deg); opacity: 1; }
-            60% { transform: scale(1.1) rotate(5deg); opacity: 1; }
-            100% { transform: scale(0) rotate(0deg); opacity: 0; }
-        }
-
-        .richa-waving-hand {
-            position: fixed;
-            top: 20px;
-            right: 100px;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 1100;
-            animation: wave-hand 2s ease-in-out;
-        }
-
-        @keyframes wave-hand {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(20deg); }
-            75% { transform: rotate(-20deg); }
-        }
-
-        .richa-progress-hearts {
-            position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-            color: #ff69b4;
-            animation: progress-float 2s ease-in-out infinite;
-        }
-
-        @keyframes progress-float {
-            0%, 100% { transform: translateY(-50%) translateX(0); }
-            50% { transform: translateY(-50%) translateX(-10px); }
-        }
-
-        .richa-butterfly {
-            position: fixed;
-            font-size: 1.8rem;
-            pointer-events: none;
-            z-index: 1000;
-            animation: butterfly-fly 8s linear infinite;
-        }
-
-        @keyframes butterfly-fly {
-            0% { transform: translateX(-100px) translateY(0) rotate(0deg); }
-            25% { transform: translateX(25vw) translateY(-50px) rotate(10deg); }
-            50% { transform: translateX(50vw) translateY(0) rotate(-10deg); }
-            75% { transform: translateX(75vw) translateY(-30px) rotate(5deg); }
-            100% { transform: translateX(100vw) translateY(0) rotate(0deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .question-actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal">
-        <div class="auth-content">
-            <h2 class="auth-title">Student Login</h2>
-            
-            <!-- Login Form -->
-            <div id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Roll Number</label>
-                    <input type="text" id="rollInput" class="form-input" placeholder="25MCSXXX" maxlength="8">
-                </div>
-                <button id="loginBtn" class="btn btn-primary" style="width: 100%;">Verify Student</button>
-            </div>
+      <div class="auth-content">
+        <h2 class="auth-title">Student Login</h2>
 
-            <!-- Verification Step -->
-            <div id="verificationStep" class="student-verification">
-                <div class="student-name" id="studentNameDisplay"></div>
-                <div class="student-roll" id="studentRollDisplay"></div>
-                <p style="margin-bottom: 1.5rem; color: #64748b; font-size: 0.9rem;">Is this information correct?</p>
-                <div class="verification-actions">
-                    <button id="backBtn" class="btn btn-secondary">Back</button>
-                    <button id="startBtn" class="btn btn-success">Start Exam</button>
-                </div>
-            </div>
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Roll Number</label>
+            <input
+              type="text"
+              id="rollInput"
+              class="form-input"
+              placeholder="25MCSXXX"
+              maxlength="8"
+            />
+          </div>
+          <button id="loginBtn" class="btn btn-primary" style="width: 100%">
+            Verify Student
+          </button>
         </div>
+
+        <!-- Verification Step -->
+        <div id="verificationStep" class="student-verification">
+          <div class="student-name" id="studentNameDisplay"></div>
+          <div class="student-roll" id="studentRollDisplay"></div>
+          <p style="margin-bottom: 1.5rem; color: #64748b; font-size: 0.9rem">
+            Is this information correct?
+          </p>
+          <div class="verification-actions">
+            <button id="backBtn" class="btn btn-secondary">Back</button>
+            <button id="startBtn" class="btn btn-success">Start Exam</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Header -->
     <header class="header">
-        <div class="header-content">
-            <div class="logo">C++ Programming Assessment</div>
-            <div class="timer-section">
-                <div class="timer" id="timer">60:00</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress"></div>
-                </div>
-            </div>
+      <div class="header-content">
+        <div class="logo">C++ Programming Assessment</div>
+        <div class="timer-section">
+          <div class="timer" id="timer">60:00</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+          </div>
         </div>
+      </div>
     </header>
 
     <!-- Main Content -->
-    <div class="container" id="mainContent" style="display: none;">
-        <!-- Exam Header -->
-        <div class="exam-header">
-            <div class="student-info">
-                <div class="welcome-text">Welcome, <span id="studentName">Student</span></div>
-                <div style="font-size: 0.875rem; color: #64748b;">✅ Auto-save enabled</div>
-            </div>
-            <div class="exam-stats">
-                <div class="stat-item">
-                    <div class="stat-number">3</div>
-                    <div class="stat-label">Questions</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">100</div>
-                    <div class="stat-label">Total Points</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">60</div>
-                    <div class="stat-label">Minutes</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="completedCount">0</div>
-                    <div class="stat-label">Completed</div>
-                </div>
-            </div>
+    <div class="container" id="mainContent" style="display: none">
+      <!-- Exam Header -->
+      <div class="exam-header">
+        <div class="student-info">
+          <div class="welcome-text">
+            Welcome, <span id="studentName">Student</span>
+          </div>
+          <div style="font-size: 0.875rem; color: #64748b">
+            ✅ Auto-save enabled
+          </div>
         </div>
+        <div class="exam-stats">
+          <div class="stat-item">
+            <div class="stat-number">3</div>
+            <div class="stat-label">Questions</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">100</div>
+            <div class="stat-label">Total Points</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">60</div>
+            <div class="stat-label">Minutes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="completedCount">0</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+      </div>
 
-        <!-- Question 1 -->
-        <div class="question-card">
-            <div class="question-header">
-                <div class="question-title">1. Transpose of Matrix</div>
-                <div class="question-points">33 Points</div>
+      <!-- Question 1 -->
+      <div class="question-card">
+        <div class="question-header">
+          <div class="question-title">1. Find the Second Largest Element</div>
+          <div class="question-meta">
+            <span class="difficulty-tag medium">Medium</span>
+            <div class="question-points">33 Points</div>
+          </div>
+        </div>
+        <div class="question-tags">
+          <span class="company-tag">Google</span>
+          <span class="company-tag">Microsoft</span>
+          <span class="topic-tag">Array</span>
+          <span class="topic-tag">Sorting</span>
+        </div>
+        <div class="question-content">
+          <div class="problem-section">
+            <div class="section-title">Problem Statement</div>
+            <div class="question-text">
+              Given an array of integers, find the second largest element. If no
+              second largest element exists, return -1.
             </div>
-            <div class="question-content">
-                <div class="problem-section">
-                    <div class="section-title">Problem Statement</div>
-                    <div class="question-text">
-                        Given a 2D matrix, return the transpose of the matrix. The transpose of a matrix is obtained by changing rows to columns and columns to rows.
-                    </div>
-                </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Example</div>
-                    <div class="example-box">
-                        <strong>Input:</strong> matrix = [[1,2,3],[4,5,6],[7,8,9]]<br>
-                        <strong>Output:</strong> [[1,4,7],[2,5,8],[3,6,9]]<br>
-                        <strong>Explanation:</strong> Rows become columns and columns become rows.
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Example</div>
+            <div class="example-box">
+              <strong>Input:</strong> arr = [1,2,3,4,5]<br />
+              <strong>Output:</strong> 4<br />
+              <strong>Explanation:</strong> The largest element is 5, so the
+              second largest is 4.
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Constraints</div>
-                    <div class="constraints-list">
-                        <ul>
-                            <li>1 ≤ matrix.length ≤ 1000</li>
-                            <li>1 ≤ matrix[i].length ≤ 1000</li>
-                            <li>-10<sup>9</sup> ≤ matrix[i][j] ≤ 10<sup>9</sup></li>
-                        </ul>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Constraints</div>
+            <div class="constraints-list">
+              <ul>
+                <li>1 ≤ arr.length ≤ 1000</li>
+                <li>-10<sup>9</sup> ≤ arr[i] ≤ 10<sup>9</sup></li>
+                <li>Return -1 if no second largest exists</li>
+              </ul>
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Sample Test Cases</div>
-                    <div class="test-cases">
-                        <div class="test-case">
-                            <strong>Test 1:</strong> [[1,2,3],[4,5,6]] → [[1,4],[2,5],[3,6]]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 2:</strong> [[1,2],[3,4],[5,6]] → [[1,3,5],[2,4,6]]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 3:</strong> [[1]] → [[1]]
-                        </div>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Sample Test Cases</div>
+            <div class="test-cases">
+              <div class="test-case">
+                <strong>Test 1:</strong> [1,2,3,4,5] → 4
+              </div>
+              <div class="test-case">
+                <strong>Test 2:</strong> [10,10,10] → -1
+              </div>
+              <div class="test-case">
+                <strong>Test 3:</strong> [5,1,2,2,3] → 3
+              </div>
+            </div>
+          </div>
 
-                <div class="code-signature">vector&lt;vector&lt;int&gt;&gt; transpose(vector&lt;vector&lt;int&gt;&gt;&amp; matrix);</div>
-                <div class="code-editor">
-                    <textarea class="code-textarea" id="q1">vector<vector<int>> transpose(vector<vector<int>>& matrix) {
+          <div class="code-signature">
+            int secondLargest(vector&lt;int&gt;&amp; arr);
+          </div>
+          <div class="code-editor">
+            <div class="code-editor-header">
+              <span class="code-language">C++</span>
+              <div class="code-actions">
+                <button class="code-action-btn" onclick="resetCode(1)">
+                  Reset
+                </button>
+                <button class="code-action-btn" onclick="formatCode(1)">
+                  Format
+                </button>
+              </div>
+            </div>
+            <textarea class="code-textarea" id="q1">
+int secondLargest(vector<int>& arr) {
     // Implement this function
-    vector<vector<int>> result;
-    return result;
-}</textarea>
-                </div>
-                <div class="question-actions">
-                    <button class="btn btn-primary" onclick="saveAnswer(1)">Save</button>
-                    <button class="btn btn-success" onclick="runCode(1)">Run & Test</button>
-                    <button class="btn btn-secondary" onclick="clearAnswer(1)">Clear</button>
-                    <div class="status-dot status-empty" id="status1"></div>
-                </div>
-                <div id="output1" class="output-window"></div>
-            </div>
+    return -1;
+}</textarea
+            >
+          </div>
+          <div class="question-actions">
+            <button class="btn btn-primary" onclick="saveAnswer(1)">
+              Save
+            </button>
+            <button class="btn btn-success" onclick="runCode(1)">
+              Run & Test
+            </button>
+            <button class="btn btn-secondary" onclick="clearAnswer(1)">
+              Clear
+            </button>
+            <div class="status-dot status-empty" id="status1"></div>
+          </div>
+          <div id="output1" class="output-window"></div>
         </div>
+      </div>
 
-        <!-- Question 2 -->
-        <div class="question-card">
-            <div class="question-header">
-                <div class="question-title">2. Merge Two Sorted Arrays</div>
-                <div class="question-points">33 Points</div>
+      <!-- Question 2 -->
+      <div class="question-card">
+        <div class="question-header">
+          <div class="question-title">
+            2. Count Greater Elements than All Previous
+          </div>
+          <div class="question-meta">
+            <span class="difficulty-tag medium">Medium</span>
+            <div class="question-points">33 Points</div>
+          </div>
+        </div>
+        <div class="question-tags">
+          <span class="company-tag">Amazon</span>
+          <span class="company-tag">Apple</span>
+          <span class="topic-tag">Array</span>
+          <span class="topic-tag">Greedy</span>
+        </div>
+        <div class="question-content">
+          <div class="problem-section">
+            <div class="section-title">Problem Statement</div>
+            <div class="question-text">
+              Given an array of integers, count the number of elements that are
+              greater than all elements before them in the array. The first
+              element is always counted.
             </div>
-            <div class="question-content">
-                <div class="problem-section">
-                    <div class="section-title">Problem Statement</div>
-                    <div class="question-text">
-                        Given two sorted arrays <code>nums1</code> and <code>nums2</code>, merge them into a single sorted array and return it. The merged array should be sorted in non-decreasing order.
-                    </div>
-                </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Example</div>
-                    <div class="example-box">
-                        <strong>Input:</strong> nums1 = [1,2,3], nums2 = [2,5,6]<br>
-                        <strong>Output:</strong> [1,2,2,3,5,6]<br>
-                        <strong>Explanation:</strong> Merge both arrays maintaining sorted order.
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Example</div>
+            <div class="example-box">
+              <strong>Input:</strong> arr = [1,2,3,4,5]<br />
+              <strong>Output:</strong> 5<br />
+              <strong>Explanation:</strong> All elements are greater than
+              previous ones.
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Constraints</div>
-                    <div class="constraints-list">
-                        <ul>
-                            <li>0 ≤ nums1.length, nums2.length ≤ 200</li>
-                            <li>1 ≤ nums1.length + nums2.length ≤ 200</li>
-                            <li>-10<sup>9</sup> ≤ nums1[i], nums2[j] ≤ 10<sup>9</sup></li>
-                        </ul>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Constraints</div>
+            <div class="constraints-list">
+              <ul>
+                <li>1 ≤ arr.length ≤ 1000</li>
+                <li>-10<sup>9</sup> ≤ arr[i] ≤ 10<sup>9</sup></li>
+                <li>First element always counts as 1</li>
+              </ul>
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Sample Test Cases</div>
-                    <div class="test-cases">
-                        <div class="test-case">
-                            <strong>Test 1:</strong> [1,2,3] + [2,5,6] → [1,2,2,3,5,6]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 2:</strong> [1] + [] → [1]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 3:</strong> [] + [1] → [1]
-                        </div>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Sample Test Cases</div>
+            <div class="test-cases">
+              <div class="test-case">
+                <strong>Test 1:</strong> [1,2,3,4,5] → 5
+              </div>
+              <div class="test-case">
+                <strong>Test 2:</strong> [5,4,3,2,1] → 1
+              </div>
+              <div class="test-case">
+                <strong>Test 3:</strong> [2,2,2,2] → 1
+              </div>
+            </div>
+          </div>
 
-                <div class="code-signature">vector&lt;int&gt; mergeSortedArrays(vector&lt;int&gt;&amp; nums1, vector&lt;int&gt;&amp; nums2);</div>
-                <div class="code-editor">
-                    <textarea class="code-textarea" id="q2">vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+          <div class="code-signature">
+            int countGreaterThanPrevious(vector&lt;int&gt;&amp; arr);
+          </div>
+          <div class="code-editor">
+            <div class="code-editor-header">
+              <span class="code-language">C++</span>
+              <div class="code-actions">
+                <button class="code-action-btn" onclick="resetCode(2)">
+                  Reset
+                </button>
+                <button class="code-action-btn" onclick="formatCode(2)">
+                  Format
+                </button>
+              </div>
+            </div>
+            <textarea class="code-textarea" id="q2">
+int countGreaterThanPrevious(vector<int>& arr) {
     // Implement this function
-    vector<int> result;
-    return result;
-}</textarea>
-                </div>
-                <div class="question-actions">
-                    <button class="btn btn-primary" onclick="saveAnswer(2)">Save</button>
-                    <button class="btn btn-success" onclick="runCode(2)">Run & Test</button>
-                    <button class="btn btn-secondary" onclick="clearAnswer(2)">Clear</button>
-                    <div class="status-dot status-empty" id="status2"></div>
-                </div>
-                <div id="output2" class="output-window"></div>
-            </div>
+    return 0;
+}</textarea
+            >
+          </div>
+          <div class="question-actions">
+            <button class="btn btn-primary" onclick="saveAnswer(2)">
+              Save
+            </button>
+            <button class="btn btn-success" onclick="runCode(2)">
+              Run & Test
+            </button>
+            <button class="btn btn-secondary" onclick="clearAnswer(2)">
+              Clear
+            </button>
+            <div class="status-dot status-empty" id="status2"></div>
+          </div>
+          <div id="output2" class="output-window"></div>
         </div>
+      </div>
 
-        <!-- Question 3 -->
-        <div class="question-card">
-            <div class="question-header">
-                <div class="question-title">3. Intersection of Two Vectors</div>
-                <div class="question-points">34 Points</div>
+      <!-- Question 3 -->
+      <div class="question-card">
+        <div class="question-header">
+          <div class="question-title">3. Row with Maximum 1s in 2D Vector</div>
+          <div class="question-meta">
+            <span class="difficulty-tag hard">Hard</span>
+            <div class="question-points">34 Points</div>
+          </div>
+        </div>
+        <div class="question-tags">
+          <span class="company-tag">Facebook</span>
+          <span class="company-tag">Tesla</span>
+          <span class="topic-tag">Matrix</span>
+          <span class="topic-tag">Binary Search</span>
+        </div>
+        <div class="question-content">
+          <div class="problem-section">
+            <div class="section-title">Problem Statement</div>
+            <div class="question-text">
+              Given a 2D vector filled with 0s and 1s, find the index of the row
+              with the maximum number of 1s. If no row contains 1s, return -1.
             </div>
-            <div class="question-content">
-                <div class="problem-section">
-                    <div class="section-title">Problem Statement</div>
-                    <div class="question-text">
-                        Given two integer vectors <code>nums1</code> and <code>nums2</code>, return a vector of their intersection. Each element in the result must be unique and you may return the result in any order.
-                    </div>
-                </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Example</div>
-                    <div class="example-box">
-                        <strong>Input:</strong> nums1 = [1,2,2,1], nums2 = [2,2]<br>
-                        <strong>Output:</strong> [2]<br>
-                        <strong>Explanation:</strong> Only 2 is common in both arrays.
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Example</div>
+            <div class="example-box">
+              <strong>Input:</strong> mat = [[0,1,1],[1,1,1],[0,0,1]]<br />
+              <strong>Output:</strong> 1<br />
+              <strong>Explanation:</strong> Row 1 has the maximum number of 1s
+              (3 ones).
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Constraints</div>
-                    <div class="constraints-list">
-                        <ul>
-                            <li>1 ≤ nums1.length, nums2.length ≤ 1000</li>
-                            <li>0 ≤ nums1[i], nums2[i] ≤ 1000</li>
-                            <li>Each element in result must be unique</li>
-                        </ul>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Constraints</div>
+            <div class="constraints-list">
+              <ul>
+                <li>1 ≤ mat.length ≤ 100</li>
+                <li>1 ≤ mat[i].length ≤ 100</li>
+                <li>mat[i][j] is either 0 or 1</li>
+                <li>Return -1 if no row contains 1s</li>
+              </ul>
+            </div>
+          </div>
 
-                <div class="problem-section">
-                    <div class="section-title">Sample Test Cases</div>
-                    <div class="test-cases">
-                        <div class="test-case">
-                            <strong>Test 1:</strong> [1,2,2,1] ∩ [2,2] → [2]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 2:</strong> [4,9,5] ∩ [9,4,9,8,4] → [4,9] or [9,4]
-                        </div>
-                        <div class="test-case">
-                            <strong>Test 3:</strong> [1,2,3] ∩ [4,5,6] → []
-                        </div>
-                    </div>
-                </div>
+          <div class="problem-section">
+            <div class="section-title">Sample Test Cases</div>
+            <div class="test-cases">
+              <div class="test-case">
+                <strong>Test 1:</strong> [[0,1,1],[1,1,1],[0,0,1]] → 1
+              </div>
+              <div class="test-case">
+                <strong>Test 2:</strong> [[0,0],[0,0],[0,0]] → -1
+              </div>
+              <div class="test-case">
+                <strong>Test 3:</strong> [[1,1,1],[1,0,0],[1,1,0]] → 0
+              </div>
+            </div>
+          </div>
 
-                <div class="code-signature">vector&lt;int&gt; intersection(vector&lt;int&gt;&amp; nums1, vector&lt;int&gt;&amp; nums2);</div>
-                <div class="code-editor">
-                    <textarea class="code-textarea" id="q3">vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+          <div class="code-signature">
+            int rowWithMaxOnes(vector&lt;vector&lt;int&gt;&gt;&amp; mat);
+          </div>
+          <div class="code-editor">
+            <div class="code-editor-header">
+              <span class="code-language">C++</span>
+              <div class="code-actions">
+                <button class="code-action-btn" onclick="resetCode(3)">
+                  Reset
+                </button>
+                <button class="code-action-btn" onclick="formatCode(3)">
+                  Format
+                </button>
+              </div>
+            </div>
+            <textarea class="code-textarea" id="q3">
+int rowWithMaxOnes(vector<vector<int>>& mat) {
     // Implement this function
-    vector<int> result;
-    return result;
-}</textarea>
-                </div>
-                <div class="question-actions">
-                    <button class="btn btn-primary" onclick="saveAnswer(3)">Save</button>
-                    <button class="btn btn-success" onclick="runCode(3)">Run & Test</button>
-                    <button class="btn btn-secondary" onclick="clearAnswer(3)">Clear</button>
-                    <div class="status-dot status-empty" id="status3"></div>
-                </div>
-                <div id="output3" class="output-window"></div>
-            </div>
+    return -1;
+}</textarea
+            >
+          </div>
+          <div class="question-actions">
+            <button class="btn btn-primary" onclick="saveAnswer(3)">
+              Save
+            </button>
+            <button class="btn btn-success" onclick="runCode(3)">
+              Run & Test
+            </button>
+            <button class="btn btn-secondary" onclick="clearAnswer(3)">
+              Clear
+            </button>
+            <div class="status-dot status-empty" id="status3"></div>
+          </div>
+          <div id="output3" class="output-window"></div>
         </div>
+      </div>
 
-        <!-- Submit Section -->
-        <div class="submit-section">
-            <h2 class="submit-title">Ready to Submit?</h2>
-            <p class="submit-text">Make sure you've completed all questions before submitting. Results will be shown immediately.</p>
-            <button class="btn btn-submit" onclick="submitTest()" id="submitBtn">Submit Test</button>
+      <!-- Submit Section -->
+      <div class="submit-section">
+        <h2 class="submit-title">🚀 Ready to Submit?</h2>
+        <p class="submit-text">
+          Make sure you've completed all questions before submitting. Your
+          solutions will be tested against hidden test cases.
+        </p>
+        <div class="submit-stats">
+          <div class="stat-item">
+            <span class="stat-number" id="completedCount">0</span>
+            <span class="stat-label">Completed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="timeRemaining">60:00</span>
+            <span class="stat-label">Time Left</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100</span>
+            <span class="stat-label">Max Points</span>
+          </div>
         </div>
+        <button class="btn btn-submit" onclick="submitTest()" id="submitBtn">
+          🎯 Submit Solutions
+        </button>
+        <p class="submit-warning">
+          ⚠️ You can only submit once. Double-check your solutions!
+        </p>
+      </div>
     </div>
 
     <script>
-        // Student Database
-        const STUDENT_DATABASE = {
-            "25MCSA01": "MOHIL DUBEY",
-            "25MCSA02": "AABHAS MALPANI",
-            "25MCSA03": "TEJA RISHITHA GANGAVARAM",
-            "25MCSA04": "KUMARI ANU",
-            "25MCSA05": "SOUGATA ROY",
-            "25MCSA06": "KRISHNA MOHANTY",
-            "25MCSA07": "HARSHIT SINGH",
-            "25MCSA08": "PRASHANT GOSWAMI",
-            "25MCSA09": "SOUVIK SARKAR",
-            "25MCSA10": "RUBIN JAIN",
-            "25MCSA11": "BHUSHAN NARESH GATHIBANDHE",
-            "25MCSA12": "LALIT KUMAR",
-            "25MCSA13": "DEVESH KUMAR VERMA",
-            "25MCSA14": "SURYANSH JAISWAL",
-            "25MCSA15": "POOJA PATIDAR",
-            "25MCSA16": "MAYANK RAJ",
-            "25MCSA17": "IKHLAS IMTIYAJ MANGURE",
-            "25MCSA18": "ABHISHEK ANAND",
-            "25MCSA19": "SHASHANK J SIROTHIYA",
-            "25MCSA20": "SHEKHAR KUMAR",
-            "25MCSA21": "MANISH RAMESHCHANDRA SAVKARE",
-            "25MCSA22": "PAVAN MURTHY R",
-            "25MCSA23": "ANKIT PAWAR",
-            "25MCSA24": "HRITHIK VISHAL PAWAR",
-            "25MCSA25": "EISLAVATH SRI SAI KIRAN",
-            "25MCSS01": "ROHIT SHARMA",
-            "25MCSS02": "RICHA VERMA",
-            "25MCSS03": "AMIT KUMAR SINGH",
-            "25MCSS04": "AVNI TRIVEDI",
-            "25MCSS05": "HARSHIT JAIN",
-            "25MCSS06": "ATUL KUMAR GUPTA",
-            "25MCSS07": "ADARSH DUBEY",
-            "25MCSS08": "SAI PAVANI BOORNA",
-            "25MCSS09": "SAI KANDREGULA",
-            "25MCSS10": "ABHISHEK ASHOK TERANI",
-            "25MCSS11": "MANIDEEPAK TOONAM",
-            "25MCSS12": "ANKUSH PATEL",
-            "25MCSS13": "GIRISH VASTRANE",
-            "25MCSS14": "ANIKET RAJKUMAR BHUTANGE",
-            "25MCSS15": "GOURAV CHOUHAN",
-        };
+      // Student Database
+      const STUDENT_DATABASE = {
+        "25MCSA01": "MOHIL DUBEY",
+        "25MCSA02": "AABHAS MALPANI",
+        "25MCSA03": "TEJA RISHITHA GANGAVARAM",
+        "25MCSA04": "KUMARI ANU",
+        "25MCSA05": "SOUGATA ROY",
+        "25MCSA06": "KRISHNA MOHANTY",
+        "25MCSA07": "HARSHIT SINGH",
+        "25MCSA08": "PRASHANT GOSWAMI",
+        "25MCSA09": "SOUVIK SARKAR",
+        "25MCSA10": "RUBIN JAIN",
+        "25MCSA11": "BHUSHAN NARESH GATHIBANDHE",
+        "25MCSA12": "LALIT KUMAR",
+        "25MCSA13": "DEVESH KUMAR VERMA",
+        "25MCSA14": "SURYANSH JAISWAL",
+        "25MCSA15": "POOJA PATIDAR",
+        "25MCSA16": "MAYANK RAJ",
+        "25MCSA17": "IKHLAS IMTIYAJ MANGURE",
+        "25MCSA18": "ABHISHEK ANAND",
+        "25MCSA19": "SHASHANK J SIROTHIYA",
+        "25MCSA20": "SHEKHAR KUMAR",
+        "25MCSA21": "MANISH RAMESHCHANDRA SAVKARE",
+        "25MCSA22": "PAVAN MURTHY R",
+        "25MCSA23": "ANKIT PAWAR",
+        "25MCSA24": "HRITHIK VISHAL PAWAR",
+        "25MCSA25": "EISLAVATH SRI SAI KIRAN",
+        "25MCSS01": "ROHIT SHARMA",
+        "25MCSS02": "RICHA VERMA",
+        "25MCSS03": "AMIT KUMAR SINGH",
+        "25MCSS04": "AVNI TRIVEDI",
+        "25MCSS05": "HARSHIT JAIN",
+        "25MCSS06": "ATUL KUMAR GUPTA",
+        "25MCSS07": "ADARSH DUBEY",
+        "25MCSS08": "SAI PAVANI BOORNA",
+        "25MCSS09": "SAI KANDREGULA",
+        "25MCSS10": "ABHISHEK ASHOK TERANI",
+        "25MCSS11": "MANIDEEPAK TOONAM",
+        "25MCSS12": "ANKUSH PATEL",
+        "25MCSS13": "GIRISH VASTRANE",
+        "25MCSS14": "ANIKET RAJKUMAR BHUTANGE",
+        "25MCSS15": "GOURAV CHOUHAN",
+      };
 
-        let studentName = "";
-        let answers = {};
-        let timeLeft = 60 * 60;
-        let timer;
+      let studentName = "";
+      let answers = {};
+      let timeLeft = 60 * 60;
+      let timer;
+      let isDeveloper = false; // Developer mode for testing
 
-        const defaultTemplates = {
-            1: `vector<vector<int>> transpose(vector<vector<int>>& matrix) {\n    // Implement this function\n    vector<vector<int>> result;\n    return result;\n}`,
-            2: `vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`,
-            3: `vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`
-        };
+      const defaultTemplates = {
+        1: `int secondLargest(vector<int>& arr) {\n    // Implement this function\n    return -1;\n}`,
+        2: `int countGreaterThanPrevious(vector<int>& arr) {\n    // Implement this function\n    return 0;\n}`,
+        3: `int rowWithMaxOnes(vector<vector<int>>& mat) {\n    // Implement this function\n    return -1;\n}`,
+      };
 
-        // Richa's Special Features - Optimized
-        let richaLastEncouragement = 0;
-        let richaTestCount = 0;
-        const richaMessages = [
-            "Welcome Richa! Ready to shine? ✨💖",
-            "Great progress! Keep going! 🌟",
-            "Excellent work! 🚀💫",
-            "You're doing fantastic! 💪✨"
-        ];
-        
-        const richaTestQuotes = [
-            "Nice work, Richa! 🎉",
-            "Great job! ✨",
-            "Excellent! 🌟",
-            "Perfect! 💫"
-        ];
+      // Richa's Special Features - Optimized
+      let richaLastEncouragement = 0;
+      let richaTestCount = 0;
+      const richaMessages = [
+        "Welcome Richa! Ready to shine? ✨💖",
+        "Great progress! Keep going! 🌟",
+        "Excellent work! 🚀💫",
+        "You're doing fantastic! 💪✨",
+      ];
 
-        function richaEncouragement() {
-            const now = Date.now();
-            // Every 20 minutes (1200 seconds)
-            if (timeLeft % 1200 === 0 && timeLeft > 0 && (now - richaLastEncouragement) > 1200000) {
-                richaLastEncouragement = now;
-                const message = richaMessages[Math.floor(Math.random() * richaMessages.length)];
-                showRichaMessage(message);
-                createFloatingEmojis(['✨', '💖']);
-            }
+      const richaTestQuotes = [
+        "Nice work, Richa! 🎉",
+        "Great job! ✨",
+        "Excellent! 🌟",
+        "Perfect! 💫",
+      ];
+
+      function richaEncouragement() {
+        const now = Date.now();
+        // Every 20 minutes (1200 seconds)
+        if (
+          timeLeft % 1200 === 0 &&
+          timeLeft > 0 &&
+          now - richaLastEncouragement > 1200000
+        ) {
+          richaLastEncouragement = now;
+          const message =
+            richaMessages[Math.floor(Math.random() * richaMessages.length)];
+          showRichaMessage(message);
+          createFloatingEmojis(["✨", "💖"]);
         }
+      }
 
-        function richaSuccessCelebration(passed, total) {
-            richaTestCount++;
-            if (passed > 0 && richaTestCount % 3 === 0) { // Every 3rd test run
-                const message = richaTestQuotes[Math.floor(Math.random() * richaTestQuotes.length)];
-                showRichaMessage(message);
-                createFloatingEmojis(['✨', '💖']);
-            }
+      function richaSuccessCelebration(passed, total) {
+        richaTestCount++;
+        if (passed > 0 && richaTestCount % 3 === 0) {
+          // Every 3rd test run
+          const message =
+            richaTestQuotes[Math.floor(Math.random() * richaTestQuotes.length)];
+          showRichaMessage(message);
+          createFloatingEmojis(["✨", "💖"]);
         }
+      }
 
-        function createFloatingEmojis(emojis) {
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const emoji = document.createElement('div');
-                    emoji.className = 'floating-emoji';
-                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                    emoji.style.left = Math.random() * window.innerWidth + 'px';
-                    emoji.style.top = window.innerHeight + 'px';
-                    document.body.appendChild(emoji);
-                    
-                    setTimeout(() => {
-                        if (document.body.contains(emoji)) {
-                            document.body.removeChild(emoji);
-                        }
-                    }, 4000);
-                }, i * 200);
-            }
-        }
+      function createFloatingEmojis(emojis) {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            const emoji = document.createElement("div");
+            emoji.className = "floating-emoji";
+            emoji.textContent =
+              emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.left = Math.random() * window.innerWidth + "px";
+            emoji.style.top = window.innerHeight + "px";
+            document.body.appendChild(emoji);
 
-        function createSparkles(count) {
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const sparkle = document.createElement('div');
-                    sparkle.className = 'sparkle';
-                    sparkle.style.left = Math.random() * window.innerWidth + 'px';
-                    sparkle.style.top = Math.random() * window.innerHeight + 'px';
-                    document.body.appendChild(sparkle);
-                    
-                    setTimeout(() => {
-                        if (document.body.contains(sparkle)) {
-                            document.body.removeChild(sparkle);
-                        }
-                    }, 2000);
-                }, i * 100);
-            }
-        }
-
-        function showRichaMessage(message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'richa-message';
-            messageDiv.textContent = message;
-            document.body.appendChild(messageDiv);
-            
             setTimeout(() => {
-                if (document.body.contains(messageDiv)) {
-                    document.body.removeChild(messageDiv);
-                }
-            }, 3000);
+              if (document.body.contains(emoji)) {
+                document.body.removeChild(emoji);
+              }
+            }, 4000);
+          }, i * 200);
         }
+      }
 
-        function addRichaDecorations() {
-            // Add rainbow header decoration
-            const headerDecoration = document.createElement('div');
-            headerDecoration.className = 'richa-header-decoration';
-            document.querySelector('.header').appendChild(headerDecoration);
-            
-            // Add floating hearts background
-            const heartsContainer = document.createElement('div');
-            heartsContainer.className = 'richa-bg-hearts';
-            for (let i = 0; i < 8; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'floating-heart';
-                heart.textContent = '💖';
-                heart.style.left = Math.random() * 100 + '%';
-                heart.style.top = Math.random() * 100 + '%';
-                heart.style.animationDelay = Math.random() * 8 + 's';
-                heartsContainer.appendChild(heart);
-            }
-            document.body.appendChild(heartsContainer);
-            
-            // Add corner stars
-            const corners = [
-                { top: '20px', left: '20px' },
-                { top: '20px', right: '20px' },
-                { bottom: '20px', left: '20px' },
-                { bottom: '20px', right: '20px' }
-            ];
-            
-            corners.forEach((pos, i) => {
-                const star = document.createElement('div');
-                star.className = 'richa-corner-stars';
-                star.textContent = '⭐';
-                Object.assign(star.style, pos);
-                star.style.animationDelay = i * 0.5 + 's';
-                document.body.appendChild(star);
-            });
-            
-            // Add hearts to progress bar
-            const progressBar = document.querySelector('.progress-bar');
-            if (progressBar) {
-                const progressHearts = document.createElement('div');
-                progressHearts.className = 'richa-progress-hearts';
-                progressHearts.textContent = '💖💖';
-                progressBar.style.position = 'relative';
-                progressBar.appendChild(progressHearts);
-            }
-            
-            // Welcome message for Richa
+      function createSparkles(count) {
+        for (let i = 0; i < count; i++) {
+          setTimeout(() => {
+            const sparkle = document.createElement("div");
+            sparkle.className = "sparkle";
+            sparkle.style.left = Math.random() * window.innerWidth + "px";
+            sparkle.style.top = Math.random() * window.innerHeight + "px";
+            document.body.appendChild(sparkle);
+
             setTimeout(() => {
-                showRichaMessage('Welcome Richa! Ready to shine? ✨💖');
-                createFloatingEmojis(['✨', '💖']);
-            }, 1000);
-            
-            // Periodic motivation for Richa
-            setInterval(() => {
-                if (window.studentRollNumber === '25MCSS02' && examSecurityActive) {
-                    const motivations = [
-                        "You're doing fantastic! 🌟💖",
-                        "Keep up the amazing work! 🚀✨",
-                        "Your skills are impressive! 💪🎆",
-                        "Stay focused, you're brilliant! 🌈💫"
-                    ];
-                    if (Math.random() < 0.3) { // 30% chance every interval
-                        createFloatingEmojis(['💖', '✨']);
-                        setTimeout(() => {
-                            showRichaMessage(motivations[Math.floor(Math.random() * motivations.length)]);
-                        }, 1000);
-                    }
-                }
-            }, 120000); // Every 2 minutes
-        }
-        
-        function createMinuteHeart() {
-            const heart = document.createElement('div');
-            heart.className = 'richa-minute-heart';
-            heart.textContent = '💖';
-            heart.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-            heart.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-            document.body.appendChild(heart);
-            
-            setTimeout(() => {
-                if (document.body.contains(heart)) {
-                    document.body.removeChild(heart);
-                }
-            }, 3000);
-        }
-        
-        function createWavingHand() {
-            const hand = document.createElement('div');
-            hand.className = 'richa-waving-hand';
-            hand.textContent = '👋';
-            document.body.appendChild(hand);
-            
-            setTimeout(() => {
-                if (document.body.contains(hand)) {
-                    document.body.removeChild(hand);
-                }
+              if (document.body.contains(sparkle)) {
+                document.body.removeChild(sparkle);
+              }
             }, 2000);
+          }, i * 100);
         }
-        
-        function createButterfly() {
-            const butterfly = document.createElement('div');
-            butterfly.className = 'richa-butterfly';
-            butterfly.textContent = '🦋';
-            butterfly.style.top = Math.random() * (window.innerHeight - 200) + 100 + 'px';
-            document.body.appendChild(butterfly);
-            
-            setTimeout(() => {
-                if (document.body.contains(butterfly)) {
-                    document.body.removeChild(butterfly);
-                }
-            }, 8000);
-        }
+      }
 
-        // Initialize
-        document.addEventListener("DOMContentLoaded", function() {
-            setupAuth();
-            setupCodeEditors();
+      function showRichaMessage(message) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "richa-message";
+        messageDiv.textContent = message;
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+          if (document.body.contains(messageDiv)) {
+            document.body.removeChild(messageDiv);
+          }
+        }, 3000);
+      }
+
+      function addRichaDecorations() {
+        // Add rainbow header decoration
+        const headerDecoration = document.createElement("div");
+        headerDecoration.className = "richa-header-decoration";
+        document.querySelector(".header").appendChild(headerDecoration);
+
+        // Add floating hearts background
+        const heartsContainer = document.createElement("div");
+        heartsContainer.className = "richa-bg-hearts";
+        for (let i = 0; i < 8; i++) {
+          const heart = document.createElement("div");
+          heart.className = "floating-heart";
+          heart.textContent = "💖";
+          heart.style.left = Math.random() * 100 + "%";
+          heart.style.top = Math.random() * 100 + "%";
+          heart.style.animationDelay = Math.random() * 8 + "s";
+          heartsContainer.appendChild(heart);
+        }
+        document.body.appendChild(heartsContainer);
+
+        // Add corner stars
+        const corners = [
+          { top: "20px", left: "20px" },
+          { top: "20px", right: "20px" },
+          { bottom: "20px", left: "20px" },
+          { bottom: "20px", right: "20px" },
+        ];
+
+        corners.forEach((pos, i) => {
+          const star = document.createElement("div");
+          star.className = "richa-corner-stars";
+          star.textContent = "⭐";
+          Object.assign(star.style, pos);
+          star.style.animationDelay = i * 0.5 + "s";
+          document.body.appendChild(star);
         });
 
-        function showToast(type, title, message) {
-            // Remove existing toasts of same type to prevent spam
-            const existingToasts = document.querySelectorAll(`.toast-${type}`);
-            existingToasts.forEach(toast => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            });
-            
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            
-            const icons = {
-                success: '✅',
-                error: '❌',
-                warning: '⚠️',
-                info: 'ℹ️'
-            };
-            
-            toast.innerHTML = `
+        // Add hearts to progress bar
+        const progressBar = document.querySelector(".progress-bar");
+        if (progressBar) {
+          const progressHearts = document.createElement("div");
+          progressHearts.className = "richa-progress-hearts";
+          progressHearts.textContent = "💖💖";
+          progressBar.style.position = "relative";
+          progressBar.appendChild(progressHearts);
+        }
+
+        // Welcome message for Richa
+        setTimeout(() => {
+          showRichaMessage("Welcome Richa! Ready to shine? ✨💖");
+          createFloatingEmojis(["✨", "💖"]);
+        }, 1000);
+
+        // Periodic motivation for Richa
+        setInterval(() => {
+          if (window.studentRollNumber === "25MCSS02" && examSecurityActive) {
+            const motivations = [
+              "You're doing fantastic! 🌟💖",
+              "Keep up the amazing work! 🚀✨",
+              "Your skills are impressive! 💪🎆",
+              "Stay focused, you're brilliant! 🌈💫",
+            ];
+            if (Math.random() < 0.3) {
+              // 30% chance every interval
+              createFloatingEmojis(["💖", "✨"]);
+              setTimeout(() => {
+                showRichaMessage(
+                  motivations[Math.floor(Math.random() * motivations.length)]
+                );
+              }, 1000);
+            }
+          }
+        }, 120000); // Every 2 minutes
+      }
+
+      function createMinuteHeart() {
+        const heart = document.createElement("div");
+        heart.className = "richa-minute-heart";
+        heart.textContent = "💖";
+        heart.style.left = Math.random() * (window.innerWidth - 100) + "px";
+        heart.style.top = Math.random() * (window.innerHeight - 100) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+          if (document.body.contains(heart)) {
+            document.body.removeChild(heart);
+          }
+        }, 3000);
+      }
+
+      function createWavingHand() {
+        const hand = document.createElement("div");
+        hand.className = "richa-waving-hand";
+        hand.textContent = "👋";
+        document.body.appendChild(hand);
+
+        setTimeout(() => {
+          if (document.body.contains(hand)) {
+            document.body.removeChild(hand);
+          }
+        }, 2000);
+      }
+
+      function createButterfly() {
+        const butterfly = document.createElement("div");
+        butterfly.className = "richa-butterfly";
+        butterfly.textContent = "🦋";
+        butterfly.style.top =
+          Math.random() * (window.innerHeight - 200) + 100 + "px";
+        document.body.appendChild(butterfly);
+
+        setTimeout(() => {
+          if (document.body.contains(butterfly)) {
+            document.body.removeChild(butterfly);
+          }
+        }, 8000);
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        setupAuth();
+        setupCodeEditors();
+      });
+
+      function showToast(type, title, message) {
+        // Remove existing toasts of same type to prevent spam
+        const existingToasts = document.querySelectorAll(`.toast-${type}`);
+        existingToasts.forEach((toast) => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        });
+
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+
+        const icons = {
+          success: "✅",
+          error: "❌",
+          warning: "⚠️",
+          info: "ℹ️",
+        };
+
+        toast.innerHTML = `
                 <div class="toast-header">
                     <span>${icons[type]}</span>
                     <span>${title}</span>
                 </div>
                 <div class="toast-body">${message}</div>
             `;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 50);
-            
-            const duration = type === 'error' ? 5000 : 3000;
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(toast)) {
-                        document.body.removeChild(toast);
-                    }
-                }, 300);
-            }, duration);
-        }
 
-        function setupAuth() {
-            const loginBtn = document.getElementById("loginBtn");
-            const rollInput = document.getElementById("rollInput");
-            const startBtn = document.getElementById("startBtn");
-            const backBtn = document.getElementById("backBtn");
+        document.body.appendChild(toast);
 
-            loginBtn.addEventListener("click", function() {
-                const rollNumber = rollInput.value.trim().toUpperCase();
-                
-                if (!rollNumber) {
-                    showToast('warning', 'Input Required', 'Please enter your roll number');
-                    rollInput.focus();
-                    return;
-                }
-                
-                if (rollNumber.length !== 8) {
-                    showToast('error', 'Invalid Format', 'Roll number must be exactly 8 characters');
-                    rollInput.focus();
-                    return;
-                }
+        setTimeout(() => toast.classList.add("show"), 50);
 
-                if (!STUDENT_DATABASE[rollNumber]) {
-                    showToast('error', 'Access Denied', 'Roll number not found. Please check and try again.');
-                    rollInput.focus();
-                    return;
-                }
+        const duration = type === "error" ? 5000 : 3000;
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            if (document.body.contains(toast)) {
+              document.body.removeChild(toast);
+            }
+          }, 300);
+        }, duration);
+      }
 
-                // Check if student already attempted
-                checkExistingSubmission(rollNumber);
-            });
+      function setupAuth() {
+        const loginBtn = document.getElementById("loginBtn");
+        const rollInput = document.getElementById("rollInput");
+        const startBtn = document.getElementById("startBtn");
+        const backBtn = document.getElementById("backBtn");
 
-            startBtn.addEventListener("click", function() {
-                showToast('success', 'Exam Started', 'Good luck with your assessment!');
-                
-                setTimeout(() => {
-                    document.getElementById("studentName").textContent = `${studentName} (${window.studentRollNumber})`;
-                    document.getElementById("authModal").style.display = "none";
-                    document.getElementById("mainContent").style.display = "block";
-                    
-                    // Add Richa's special decorations
-                    if (window.studentRollNumber === '25MCSS02') {
-                        addRichaDecorations();
-                    }
-                    
-                    startTimer();
-                    initializeExamSecurity();
-                }, 800);
-            });
+        loginBtn.addEventListener("click", function () {
+          const rollNumber = rollInput.value.trim().toUpperCase();
 
-            backBtn.addEventListener("click", function() {
-                document.getElementById("loginForm").style.display = "block";
-                document.getElementById("verificationStep").style.display = "none";
-                rollInput.value = "";
-                rollInput.focus();
-            });
-
-            rollInput.addEventListener("keypress", function(e) {
-                if (e.key === "Enter") {
-                    loginBtn.click();
-                }
-            });
-            
+          if (!rollNumber) {
+            showToast(
+              "warning",
+              "Input Required",
+              "Please enter your roll number"
+            );
             rollInput.focus();
-        }
-        
-        function checkExistingSubmission(rollNumber) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
-            fetch('/api/check-submission', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rollNumber }),
-                signal: controller.signal
-            })
-            .then(response => {
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`Server error: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                if (data.alreadySubmitted) {
-                    showToast('error', 'Already Submitted', 'You have already completed this exam.');
-                    setTimeout(() => showAlreadySubmittedOverlay(data.submission), 1000);
-                } else {
-                    studentName = STUDENT_DATABASE[rollNumber];
-                    window.studentName = studentName;
-                    window.studentRollNumber = rollNumber;
-                    showToast('success', 'Student Found', `Welcome ${studentName}!`);
-                    setTimeout(() => {
-                        document.getElementById("studentNameDisplay").textContent = studentName;
-                        document.getElementById("studentRollDisplay").textContent = rollNumber;
-                        document.getElementById("loginForm").style.display = "none";
-                        document.getElementById("verificationStep").style.display = "block";
-                    }, 500);
-                }
-            })
-            .catch(error => {
-                clearTimeout(timeoutId);
-                const message = error.name === 'AbortError' ? 'Server timeout. Please try again.' : 'Connection error. Please try again.';
-                showToast('error', 'Connection Error', message);
-            });
-        }
-        
-        function showAlreadySubmittedOverlay(submission) {
-            const overlay = document.createElement('div');
-            overlay.className = 'success-overlay';
-            overlay.style.display = 'flex';
-            overlay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))';
-            
-            const percentage = submission.totalScore && submission.maxScore ? 
-                ((submission.totalScore / submission.maxScore) * 100).toFixed(1) : '0';
-            
-            overlay.innerHTML = `
+            return;
+          }
+
+          if (rollNumber.length !== 8) {
+            showToast(
+              "error",
+              "Invalid Format",
+              "Roll number must be exactly 8 characters"
+            );
+            rollInput.focus();
+            return;
+          }
+
+          if (!STUDENT_DATABASE[rollNumber]) {
+            showToast(
+              "error",
+              "Access Denied",
+              "Roll number not found. Please check and try again."
+            );
+            rollInput.focus();
+            return;
+          }
+
+          // Developer mode detection
+          if (rollNumber === "25MCSS06") {
+            isDeveloper = true;
+            console.log(
+              "🔧 Developer mode activated - Testing features enabled"
+            );
+            showToast("info", "Developer Mode", "Testing features enabled! 🔧");
+          }
+
+          // Check if student already attempted
+          checkExistingSubmission(rollNumber);
+        });
+
+        startBtn.addEventListener("click", function () {
+          // Check if this is a fresh start (URL parameter)
+          const urlParams = new URLSearchParams(window.location.search);
+          const freshStart = urlParams.get('fresh') === 'true';
+          
+          if (freshStart) {
+            clearLocalExamData();
+            showToast("info", "Fresh Start", "Starting with a clean slate!");
+          }
+          
+          showToast(
+            "success",
+            "Exam Started",
+            "Good luck with your assessment!"
+          );
+
+          setTimeout(() => {
+            document.getElementById(
+              "studentName"
+            ).textContent = `${studentName} (${window.studentRollNumber})`;
+            document.getElementById("authModal").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+
+            // Add Richa's special decorations
+            if (window.studentRollNumber === "25MCSS02") {
+              addRichaDecorations();
+            }
+
+            // Check for saved exam state and resume if found (unless fresh start)
+            if (!freshStart) {
+              resumeExamState();
+            }
+
+            startTimer();
+            initializeExamSecurity();
+          }, 800);
+        });
+
+        backBtn.addEventListener("click", function () {
+          document.getElementById("loginForm").style.display = "block";
+          document.getElementById("verificationStep").style.display = "none";
+          rollInput.value = "";
+          rollInput.focus();
+        });
+
+        rollInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            loginBtn.click();
+          }
+        });
+
+        rollInput.focus();
+      }
+
+      function checkExistingSubmission(rollNumber) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        fetch("/api/check-submission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rollNumber }),
+          signal: controller.signal,
+        })
+          .then((response) => {
+            clearTimeout(timeoutId);
+            if (!response.ok)
+              throw new Error(`Server error: ${response.status}`);
+            return response.json();
+          })
+          .then((data) => {
+            if (data.alreadySubmitted) {
+              // Clear any saved exam state for this student
+              clearLocalExamData();
+              showToast(
+                "error",
+                "Already Submitted",
+                "You have already completed this exam."
+              );
+              setTimeout(
+                () => showAlreadySubmittedOverlay(data.submission),
+                1000
+              );
+            } else {
+              studentName = STUDENT_DATABASE[rollNumber];
+              window.studentName = studentName;
+              window.studentRollNumber = rollNumber;
+              showToast("success", "Student Found", `Welcome ${studentName}!`);
+              setTimeout(() => {
+                document.getElementById("studentNameDisplay").textContent =
+                  studentName;
+                document.getElementById("studentRollDisplay").textContent =
+                  rollNumber;
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("verificationStep").style.display =
+                  "block";
+              }, 500);
+            }
+          })
+          .catch((error) => {
+            clearTimeout(timeoutId);
+            const message =
+              error.name === "AbortError"
+                ? "Server timeout. Please try again."
+                : "Connection error. Please try again.";
+            showToast("error", "Connection Error", message);
+          });
+      }
+
+      function showAlreadySubmittedOverlay(submission) {
+        const overlay = document.createElement("div");
+        overlay.className = "success-overlay";
+        overlay.style.display = "flex";
+        overlay.style.background =
+          "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))";
+
+        const percentage =
+          submission.totalScore && submission.maxScore
+            ? ((submission.totalScore / submission.maxScore) * 100).toFixed(1)
+            : "0";
+
+        overlay.innerHTML = `
                 <div class="success-content">
                     <div class="success-icon">🚫</div>
                     <h1 class="success-title">Already Submitted</h1>
                     <p class="success-message">You have already completed this exam and cannot retake it.</p>
                     <div class="success-details">
                         <h3 style="margin-bottom: 1rem;">Your Previous Results</h3>
-                        <p><strong>Score:</strong> ${submission.totalScore || 0}/${submission.maxScore || 100} (${percentage}%)</p>
-                        <p><strong>Submitted:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
+                        <p><strong>Score:</strong> ${
+                          submission.totalScore || 0
+                        }/${submission.maxScore || 100} (${percentage}%)</p>
+                        <p><strong>Submitted:</strong> ${new Date(
+                          submission.timestamp
+                        ).toLocaleString()}</p>
                     </div>
                     <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>
                 </div>
             `;
-            
-            document.body.appendChild(overlay);
-            
-            setTimeout(() => {
-                window.close();
-                window.location.href = 'about:blank';
-            }, 5000);
-        }
-        
-        let tabSwitchCount = 0;
-        let examSecurityActive = false;
-        
-        function initializeExamSecurity() {
-            examSecurityActive = true;
-            console.log('🔒 Exam security initialized');
-            
-            // Enable fullscreen mode
-            enterFullscreen();
-            
-            // Disable right-click
-            document.addEventListener('contextmenu', e => {
-                e.preventDefault();
-                showToast('warning', 'Action Blocked', 'Right-click is disabled during exam.');
-            });
-            
-            // Disable F12, Ctrl+Shift+I, Ctrl+U, F11, Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'F12' || 
-                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                    (e.ctrlKey && e.key === 'u') ||
-                    e.key === 'F11' ||
-                    e.key === 'Escape') {
-                    e.preventDefault();
-                    if (e.key === 'F11' || e.key === 'Escape') {
-                        showToast('warning', 'Fullscreen Required', 'Please stay in fullscreen mode during exam.');
-                        enterFullscreen();
-                    } else {
-                        showToast('warning', 'Action Blocked', 'Developer tools are disabled during exam.');
-                    }
-                }
-            });
-            
-            // Monitor fullscreen changes
-            document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement && examSecurityActive) {
-                    showToast('warning', 'Fullscreen Required', 'Returning to fullscreen mode...');
-                    setTimeout(() => enterFullscreen(), 1000);
-                }
-            });
-            
-            // Enhanced tab switch detection
-            const handleVisibilityChange = () => {
-                if (!examSecurityActive) return;
-                
-                if (document.hidden) {
-                    tabSwitchCount++;
-                    console.log(`⚠️ Tab switch detected: ${tabSwitchCount}/3`);
-                    
-                    showToast('warning', 'Tab Switch Warning', `Warning ${tabSwitchCount}/3: Stay on exam tab!`);
-                    
-                    if (tabSwitchCount >= 3) {
-                        console.log('🚨 Auto-submitting due to tab switches');
-                        showToast('error', 'Exam Auto-Submit', 'Too many tab switches. Submitting exam now!');
-                        examSecurityActive = false;
-                        setTimeout(() => submitTest(), 1500);
-                    }
-                }
-            };
-            
-            document.addEventListener('visibilitychange', handleVisibilityChange);
-            window.addEventListener('blur', handleVisibilityChange);
-            window.addEventListener('focus', () => {
-                if (examSecurityActive && tabSwitchCount > 0) {
-                    showToast('info', 'Focus Restored', `Warnings: ${tabSwitchCount}/3`);
-                }
-            });
-            
-            // Anti-cheating: Block external paste
-            let lastCopySource = null;
-            
-            document.addEventListener('copy', function(e) {
-                if (e.target.classList.contains('code-textarea')) {
-                    lastCopySource = 'internal';
-                    setTimeout(() => lastCopySource = null, 1000);
-                }
-            });
-            
-            document.addEventListener('paste', function(e) {
-                const target = e.target;
-                if (target.classList.contains('code-textarea')) {
-                    if (lastCopySource !== 'internal') {
-                        e.preventDefault();
-                        showToast('error', 'Paste Blocked', 'External code paste not allowed!');
-                        console.warn(`🚨 Cheating attempt: ${window.studentRollNumber} - External paste`);
-                        return;
-                    }
-                    lastCopySource = null;
-                } else {
-                    e.preventDefault();
-                    showToast('warning', 'Paste Blocked', 'Paste only allowed in code editors.');
-                }
-            });
-        }
 
-        function setupCodeEditors() {
-            for (let i = 1; i <= 3; i++) {
-                const textarea = document.getElementById("q" + i);
-                
-                textarea.addEventListener("input", function() {
-                    updateQuestionStatus(i);
-                    updateCompletedCount();
-                    
-                    // Auto-save after 2 seconds of inactivity
-                    clearTimeout(textarea.autoSaveTimer);
-                    textarea.autoSaveTimer = setTimeout(() => {
-                        autoSaveAnswer(i);
-                    }, 2000);
-                });
+        document.body.appendChild(overlay);
 
-                textarea.addEventListener("keydown", function(e) {
-                    if (e.key === 'Tab') {
-                        e.preventDefault();
-                        const start = this.selectionStart;
-                        const end = this.selectionEnd;
-                        this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
-                        this.selectionStart = this.selectionEnd = start + 4;
-                    }
-                    
-                    // Auto-indent on Enter
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const start = this.selectionStart;
-                        const lines = this.value.substring(0, start).split('\n');
-                        const currentLine = lines[lines.length - 1];
-                        const indent = currentLine.match(/^\s*/)[0];
-                        
-                        // Add extra indent if line ends with {
-                        const extraIndent = currentLine.trim().endsWith('{') ? '    ' : '';
-                        
-                        const newText = '\n' + indent + extraIndent;
-                        this.value = this.value.substring(0, start) + newText + this.value.substring(start);
-                        this.selectionStart = this.selectionEnd = start + newText.length;
-                    }
-                    
-                    // Auto-close brackets and parentheses
-                    const autoCloseMap = {
-                        '{': '}',
-                        '(': ')',
-                        '[': ']'
-                    };
-                    
-                    if (autoCloseMap[e.key]) {
-                        setTimeout(() => {
-                            const start = this.selectionStart;
-                            const closeChar = autoCloseMap[e.key];
-                            if (this.value[start] !== closeChar) {
-                                if (e.key === '{') {
-                                    this.value = this.value.substring(0, start) + '\n}' + this.value.substring(start);
-                                } else {
-                                    this.value = this.value.substring(0, start) + closeChar + this.value.substring(start);
-                                }
-                                this.selectionStart = this.selectionEnd = start;
-                            }
-                        }, 0);
-                    }
-                });
-            }
-        }
+        setTimeout(() => {
+          window.close();
+          window.location.href = "about:blank";
+        }, 5000);
+      }
 
-        function startTimer() {
-            console.log('⏰ Timer started: 60 minutes');
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                updateProgress();
+      let tabSwitchCount = 0;
+      let examSecurityActive = false;
 
-                // Special encouragement for Richa
-                if (window.studentRollNumber === '25MCSS02') {
-                    richaEncouragement();
-                }
+      function initializeExamSecurity() {
+        examSecurityActive = true;
+        console.log("🔒 Exam security initialized");
 
-                // Warning toasts
-                if (timeLeft === 600) { // 10 minutes
-                    showToast('warning', 'Time Warning', '10 minutes remaining!');
-                } else if (timeLeft === 300) { // 5 minutes
-                    showToast('warning', 'Time Warning', '5 minutes left! Review your answers.');
-                } else if (timeLeft === 60) { // 1 minute
-                    showToast('error', 'Final Warning', '1 minute left! Prepare to submit.');
-                }
+        // Enable fullscreen mode
+        enterFullscreen();
 
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    examSecurityActive = false;
-                    console.log('⏰ Time expired - auto-submitting');
-                    showToast('error', 'Time Up!', 'Auto-submitting exam now...');
-                    setTimeout(() => submitTest(), 1500);
-                }
-            }, 1000);
-        }
+        // Disable right-click
+        document.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          showToast(
+            "warning",
+            "Action Blocked",
+            "Right-click is disabled during exam."
+          );
+        });
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById("timer").textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-        }
-
-        function updateProgress() {
-            const totalTime = 60 * 60;
-            const elapsed = totalTime - timeLeft;
-            const percentage = (elapsed / totalTime) * 100;
-            document.getElementById("progress").style.width = percentage + "%";
-        }
-
-        function updateQuestionStatus(qNum) {
-            const textarea = document.getElementById("q" + qNum);
-            const statusDot = document.getElementById("status" + qNum);
-            const currentContent = textarea.value.trim();
-            const defaultContent = defaultTemplates[qNum].trim();
-
-            if (currentContent === defaultContent || currentContent === "") {
-                statusDot.className = "status-dot status-empty";
+        // Disable F12, Ctrl+Shift+I, Ctrl+U, F11, Escape
+        document.addEventListener("keydown", function (e) {
+          if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey && e.key === "I") ||
+            (e.ctrlKey && e.key === "u") ||
+            e.key === "F11" ||
+            e.key === "Escape"
+          ) {
+            e.preventDefault();
+            if (e.key === "F11" || e.key === "Escape") {
+              showToast(
+                "warning",
+                "Fullscreen Required",
+                "Please stay in fullscreen mode during exam."
+              );
+              enterFullscreen();
             } else {
-                statusDot.className = "status-dot status-modified";
+              showToast(
+                "warning",
+                "Action Blocked",
+                "Developer tools are disabled during exam."
+              );
             }
-        }
+          }
+        });
 
-        function updateCompletedCount() {
-            let completed = 0;
-            for (let i = 1; i <= 3; i++) {
-                const textarea = document.getElementById("q" + i);
-                const currentContent = textarea.value.trim();
-                const defaultContent = defaultTemplates[i].trim();
-                if (currentContent !== defaultContent && currentContent !== "") {
-                    completed++;
-                }
-            }
-            document.getElementById("completedCount").textContent = completed;
-        }
+        // Monitor fullscreen changes
+        document.addEventListener("fullscreenchange", () => {
+          if (!document.fullscreenElement && examSecurityActive) {
+            showToast(
+              "warning",
+              "Fullscreen Required",
+              "Returning to fullscreen mode..."
+            );
+            setTimeout(() => enterFullscreen(), 1000);
+          }
+        });
 
-        function saveAnswer(qNum) {
-            const textarea = document.getElementById("q" + qNum);
-            let answer = textarea.value.trim();
-            
-            if (!answer || answer === defaultTemplates[qNum].trim()) {
-                showToast('warning', 'Nothing to Save', 'Please write some code before saving');
-                return;
-            }
-            
-            // Auto-format the code
-            answer = formatCppCode(answer);
-            textarea.value = answer;
-            
-            answers[qNum] = answer;
-            
-            const statusDot = document.getElementById("status" + qNum);
-            statusDot.className = "status-dot status-saved";
-            
-            localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
-            showToast('success', 'Answer Saved', `Question ${qNum} saved successfully`);
-            
-            // Gentle encouragement for Richa after saving
-            if (window.studentRollNumber === '25MCSS02') {
-                createFloatingEmojis(['✨', '💖']);
-                setTimeout(() => {
-                    showRichaMessage("Great save! 💫");
-                }, 500);
-            }
-        }
-        
-        function autoSaveAnswer(qNum) {
-            const textarea = document.getElementById("q" + qNum);
-            const answer = textarea.value.trim();
-            
-            if (!answer || answer === defaultTemplates[qNum].trim()) {
-                return; // Don't auto-save empty or default content
-            }
-            
-            answers[qNum] = answer;
-            localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
-            
-            // Update status to show it's auto-saved
-            const statusDot = document.getElementById("status" + qNum);
-            statusDot.className = "status-dot status-saved";
-        }
-        
-        function formatCppCode(code) {
-            if (!code || code.trim() === '') return code;
-            
-            let lines = code.split('\n');
-            let formatted = [];
-            let indentLevel = 0;
-            const indentSize = 4;
-            
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (line === '') {
-                    formatted.push('');
-                    continue;
-                }
-                
-                // Decrease indent for closing braces
-                if (line.startsWith('}')) {
-                    indentLevel = Math.max(0, indentLevel - 1);
-                }
-                
-                // Add proper indentation
-                let indent = ' '.repeat(indentLevel * indentSize);
-                
-                // Format specific C++ constructs
-                line = formatCppLine(line);
-                
-                formatted.push(indent + line);
-                
-                // Increase indent after opening braces
-                if (line.endsWith('{')) {
-                    indentLevel++;
-                }
-            }
-            
-            return formatted.join('\n');
-        }
-        
-        function formatCppLine(line) {
-            // Add space after keywords
-            line = line.replace(/\b(if|for|while|switch)\s*\(/g, '$1 (');
-            
-            // Add spaces around compound operators
-            line = line.replace(/(\w)\s*\+=\s*(\w)/g, '$1 += $2');
-            line = line.replace(/(\w)\s*-=\s*(\w)/g, '$1 -= $2');
-            line = line.replace(/(\w)\s*\*=\s*(\w)/g, '$1 *= $2');
-            line = line.replace(/(\w)\s*\/=\s*(\w)/g, '$1 /= $2');
-            line = line.replace(/(\w)\s*%=\s*(\w)/g, '$1 %= $2');
-            
-            // Add spaces around single = but NOT compound operators
-            line = line.replace(/([^+\-*\/!<>=])=([^=])/g, '$1 = $2');
-            
-            // Add spaces around comparison operators
-            line = line.replace(/([^=!<>])==([^=])/g, '$1 == $2');
-            line = line.replace(/([^=!<>])!=([^=])/g, '$1 != $2');
-            line = line.replace(/([^<])<=([^=])/g, '$1 <= $2');
-            line = line.replace(/([^>])>=([^=])/g, '$1 >= $2');
-            line = line.replace(/([^<>])<([^<=])/g, '$1 < $2');
-            line = line.replace(/([^<>])>([^>=])/g, '$1 > $2');
-            
-            // Add space after commas
-            line = line.replace(/,([^\s])/g, ', $1');
-            
-            // Add space after semicolons in for loops
-            line = line.replace(/;([^\s])/g, '; $1');
-            
-            // Format function declarations
-            line = line.replace(/\)\s*\{/g, ') {');
-            
-            // Clean up multiple spaces
-            line = line.replace(/\s+/g, ' ');
-            
-            return line;
-        }
+        // Enhanced tab switch detection
+        const handleVisibilityChange = () => {
+          if (!examSecurityActive) return;
 
-        function clearAnswer(qNum) {
-            const textarea = document.getElementById("q" + qNum);
-            if (textarea.value.trim() === defaultTemplates[qNum].trim()) {
-                showToast('warning', 'Already Empty', 'This question is already cleared');
-                return;
+          // Developer exemption - bypass all security measures
+          if (isDeveloper) {
+            console.log("🔧 Developer mode: Tab switch detection bypassed");
+            return;
+          }
+
+          if (document.hidden) {
+            // Save state immediately when user switches away
+            saveCurrentExamState();
+
+            tabSwitchCount++;
+            console.log(`⚠️ Tab switch detected: ${tabSwitchCount}/3`);
+
+            showToast(
+              "warning",
+              "Tab Switch Warning",
+              `Warning ${tabSwitchCount}/3: Stay on exam tab!`
+            );
+
+            if (tabSwitchCount >= 3) {
+              console.log("🚨 Auto-submitting due to tab switches");
+              showToast(
+                "error",
+                "Exam Auto-Submit",
+                "Too many tab switches. Submitting exam now!"
+              );
+              examSecurityActive = false;
+              setTimeout(() => submitTest(), 1500);
             }
-            
-            textarea.value = defaultTemplates[qNum];
-            updateQuestionStatus(qNum);
+          }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("blur", handleVisibilityChange);
+        window.addEventListener("focus", () => {
+          if (examSecurityActive && tabSwitchCount > 0) {
+            showToast(
+              "info",
+              "Focus Restored",
+              `Warnings: ${tabSwitchCount}/3`
+            );
+          }
+        });
+
+        // Save state before page unload/refresh
+        window.addEventListener("beforeunload", function (e) {
+          saveCurrentExamState();
+          console.log("💾 Saved exam state before page unload");
+        });
+
+        // Anti-cheating: Block external paste
+        let lastCopySource = null;
+
+        document.addEventListener("copy", function (e) {
+          if (e.target.classList.contains("code-textarea")) {
+            lastCopySource = "internal";
+            setTimeout(() => (lastCopySource = null), 1000);
+          }
+        });
+
+        document.addEventListener("paste", function (e) {
+          const target = e.target;
+
+          // Developer exemption - allow all paste operations
+          if (isDeveloper) {
+            console.log("🔧 Developer mode: Paste allowed");
+            return;
+          }
+
+          if (target.classList.contains("code-textarea")) {
+            if (lastCopySource !== "internal") {
+              e.preventDefault();
+              showToast(
+                "error",
+                "Paste Blocked",
+                "External code paste not allowed!"
+              );
+              console.warn(
+                `🚨 Cheating attempt: ${window.studentRollNumber} - External paste`
+              );
+              return;
+            }
+            lastCopySource = null;
+          } else {
+            e.preventDefault();
+            showToast(
+              "warning",
+              "Paste Blocked",
+              "Paste only allowed in code editors."
+            );
+          }
+        });
+      }
+
+      function setupCodeEditors() {
+        for (let i = 1; i <= 3; i++) {
+          const textarea = document.getElementById("q" + i);
+
+          textarea.addEventListener("input", function () {
+            updateQuestionStatus(i);
             updateCompletedCount();
-            showToast('success', 'Answer Cleared', `Question ${qNum} has been reset`);
-            
-            // Gentle encouragement for Richa when clearing
-            if (window.studentRollNumber === '25MCSS02') {
-                setTimeout(() => {
-                    showRichaMessage("Fresh start! 💪");
-                }, 300);
-            }
-        }
 
-        function runCode(qNum) {
-            const textarea = document.getElementById("q" + qNum);
-            let code = textarea.value.trim();
-            const outputDiv = document.getElementById("output" + qNum);
-            
-            if (!code || code === defaultTemplates[qNum].trim()) {
-                showToast('warning', 'No Code to Run', 'Please write some code before testing');
-                return;
+            // Auto-save after 2 seconds of inactivity
+            clearTimeout(textarea.autoSaveTimer);
+            textarea.autoSaveTimer = setTimeout(() => {
+              autoSaveAnswer(i);
+            }, 2000);
+          });
+
+          textarea.addEventListener("keydown", function (e) {
+            if (e.key === "Tab") {
+              e.preventDefault();
+              const start = this.selectionStart;
+              const end = this.selectionEnd;
+              this.value =
+                this.value.substring(0, start) +
+                "    " +
+                this.value.substring(end);
+              this.selectionStart = this.selectionEnd = start + 4;
             }
-            
-            // Auto-format code before running
-            code = formatCppCode(code);
-            textarea.value = code;
-            
-            showToast('info', 'Running Tests', 'Compiling and testing your code...');
-            outputDiv.innerHTML = '<div style="color: #3b82f6;">🔄 Compiling and testing...</div>';
-            outputDiv.style.display = 'block';
-            
-            fetch('/api/test-code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    questionNumber: qNum,
-                    code: code,
-                    studentName: window.studentName || studentName
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                displayTestResults(qNum, data);
-                if (data.error) {
-                    showToast('error', 'Compilation Error', 'Check the output panel for details');
-                } else {
-                    const passedTests = data.tests ? data.tests.filter(t => t.passed).length : 0;
-                    const totalTests = data.tests ? data.tests.length : 0;
-                    showToast('success', 'Tests Complete', `${passedTests}/${totalTests} test cases passed`);
+
+            // Auto-indent on Enter
+            if (e.key === "Enter") {
+              e.preventDefault();
+              const start = this.selectionStart;
+              const lines = this.value.substring(0, start).split("\n");
+              const currentLine = lines[lines.length - 1];
+              const indent = currentLine.match(/^\s*/)[0];
+
+              // Add extra indent if line ends with {
+              const extraIndent = currentLine.trim().endsWith("{")
+                ? "    "
+                : "";
+
+              const newText = "\n" + indent + extraIndent;
+              this.value =
+                this.value.substring(0, start) +
+                newText +
+                this.value.substring(start);
+              this.selectionStart = this.selectionEnd = start + newText.length;
+            }
+
+            // Auto-close brackets and parentheses
+            const autoCloseMap = {
+              "{": "}",
+              "(": ")",
+              "[": "]",
+            };
+
+            if (autoCloseMap[e.key]) {
+              setTimeout(() => {
+                const start = this.selectionStart;
+                const closeChar = autoCloseMap[e.key];
+                if (this.value[start] !== closeChar) {
+                  if (e.key === "{") {
+                    this.value =
+                      this.value.substring(0, start) +
+                      "\n}" +
+                      this.value.substring(start);
+                  } else {
+                    this.value =
+                      this.value.substring(0, start) +
+                      closeChar +
+                      this.value.substring(start);
+                  }
+                  this.selectionStart = this.selectionEnd = start;
                 }
-            })
-            .catch(error => {
-                outputDiv.innerHTML = `<div style="color: #ef4444;">❌ Error: ${error.message}</div>`;
-                showToast('error', 'Connection Error', 'Failed to run tests. Please try again.');
-            });
+              }, 0);
+            }
+          });
+        }
+      }
+
+      function startTimer() {
+        console.log("⏰ Timer started: 60 minutes");
+        timer = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          updateProgress();
+
+          // Periodic auto-save of exam state (every 30 seconds)
+          if (timeLeft % 30 === 0) {
+            saveCurrentExamState();
+          }
+
+          // Special encouragement for Richa
+          if (window.studentRollNumber === "25MCSS02") {
+            richaEncouragement();
+          }
+
+          // Warning toasts
+          if (timeLeft === 600) {
+            // 10 minutes
+            showToast("warning", "Time Warning", "10 minutes remaining!");
+          } else if (timeLeft === 300) {
+            // 5 minutes
+            showToast(
+              "warning",
+              "Time Warning",
+              "5 minutes left! Review your answers."
+            );
+          } else if (timeLeft === 60) {
+            // 1 minute
+            showToast(
+              "error",
+              "Final Warning",
+              "1 minute left! Prepare to submit."
+            );
+          }
+
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            examSecurityActive = false;
+            console.log("⏰ Time expired - auto-submitting");
+            showToast("error", "Time Up!", "Auto-submitting exam now...");
+            setTimeout(() => submitTest(), 1500);
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+        document.getElementById("timer").textContent = timeString;
+
+        // Update submit section time remaining
+        const timeRemainingEl = document.getElementById("timeRemaining");
+        if (timeRemainingEl) {
+          timeRemainingEl.textContent = timeString;
         }
 
-        function displayTestResults(qNum, results) {
-            const outputDiv = document.getElementById("output" + qNum);
-            
-            if (results.error) {
-                outputDiv.innerHTML = `
+        // Update completed count
+        updateCompletedCount();
+      }
+
+      function updateCompletedCount() {
+        const completedCount = Object.keys(answers).length;
+        const completedEl = document.getElementById("completedCount");
+        if (completedEl) {
+          completedEl.textContent = completedCount;
+        }
+      }
+
+      function updateProgress() {
+        const totalTime = 60 * 60;
+        const elapsed = totalTime - timeLeft;
+        const percentage = (elapsed / totalTime) * 100;
+        document.getElementById("progress").style.width = percentage + "%";
+      }
+
+      function updateQuestionStatus(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        const statusDot = document.getElementById("status" + qNum);
+        const currentContent = textarea.value.trim();
+        const defaultContent = defaultTemplates[qNum].trim();
+
+        if (currentContent === defaultContent || currentContent === "") {
+          statusDot.className = "status-dot status-empty";
+        } else {
+          statusDot.className = "status-dot status-modified";
+        }
+      }
+
+      function updateCompletedCount() {
+        let completed = 0;
+        for (let i = 1; i <= 3; i++) {
+          const textarea = document.getElementById("q" + i);
+          const currentContent = textarea.value.trim();
+          const defaultContent = defaultTemplates[i].trim();
+          if (currentContent !== defaultContent && currentContent !== "") {
+            completed++;
+          }
+        }
+        document.getElementById("completedCount").textContent = completed;
+      }
+
+      function saveAnswer(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        let answer = textarea.value.trim();
+
+        if (!answer || answer === defaultTemplates[qNum].trim()) {
+          showToast(
+            "warning",
+            "Nothing to Save",
+            "Please write some code before saving"
+          );
+          return;
+        }
+
+        // Auto-format the code
+        answer = formatCppCode(answer);
+        textarea.value = answer;
+
+        answers[qNum] = answer;
+
+        const statusDot = document.getElementById("status" + qNum);
+        statusDot.className = "status-dot status-saved";
+
+        localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
+
+        // Update completed count in submit section
+        updateCompletedCount();
+
+        showToast(
+          "success",
+          "Answer Saved",
+          `Question ${qNum} saved successfully`
+        );
+
+        // Gentle encouragement for Richa after saving
+        if (window.studentRollNumber === "25MCSS02") {
+          createFloatingEmojis(["✨", "💖"]);
+          setTimeout(() => {
+            showRichaMessage("Great save! 💫");
+          }, 500);
+        }
+      }
+
+      function resetCode(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        const defaultCode = defaultTemplates[qNum];
+
+        if (
+          confirm(
+            `Are you sure you want to reset Question ${qNum} to default template?`
+          )
+        ) {
+          textarea.value = defaultCode;
+
+          // Update status
+          const statusDot = document.getElementById("status" + qNum);
+          statusDot.className = "status-dot status-empty";
+
+          // Remove from answers
+          delete answers[qNum];
+          localStorage.setItem(
+            `${studentName}_answers`,
+            JSON.stringify(answers)
+          );
+
+          showToast(
+            "info",
+            "Code Reset",
+            `Question ${qNum} reset to default template`
+          );
+        }
+      }
+
+      function formatCode(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        const code = textarea.value.trim();
+
+        if (!code || code === defaultTemplates[qNum].trim()) {
+          showToast(
+            "warning",
+            "Nothing to Format",
+            "Please write some code first"
+          );
+          return;
+        }
+
+        const formattedCode = formatCppCode(code);
+        textarea.value = formattedCode;
+
+        showToast("success", "Code Formatted", "Code formatting applied");
+      }
+
+      function clearLocalExamData() {
+        // Clear all exam-related localStorage data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('_examState') || key.includes('_answers'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        console.log('🧹 Cleared local exam data');
+      }
+
+      function resumeExamState() {
+        const savedState = localStorage.getItem(
+          `${window.studentRollNumber}_examState`
+        );
+
+        if (savedState) {
+          try {
+            const examState = JSON.parse(savedState);
+
+            // Check if the saved state is recent (within 24 hours)
+            const timeDiff = Date.now() - examState.timestamp;
+            const hoursAgo = timeDiff / (1000 * 60 * 60);
+
+            if (
+              hoursAgo < 24 &&
+              examState.rollNumber === window.studentRollNumber
+            ) {
+              // Restore answers
+              if (examState.answers) {
+                answers = examState.answers;
+                for (let qNum in answers) {
+                  const textarea = document.getElementById("q" + qNum);
+                  if (textarea && answers[qNum]) {
+                    textarea.value = answers[qNum];
+                    // Update status
+                    const statusDot = document.getElementById("status" + qNum);
+                    statusDot.className = "status-dot status-saved";
+                  }
+                }
+              }
+
+              // Restore timer (but don't exceed original time)
+              if (
+                examState.timeLeft &&
+                examState.timeLeft > 0 &&
+                examState.timeLeft <= 3600
+              ) {
+                timeLeft = examState.timeLeft;
+              }
+
+              // Restore tab switch count (if not developer)
+              if (!isDeveloper && examState.tabSwitchCount) {
+                tabSwitchCount = examState.tabSwitchCount;
+              }
+
+              const resumeMinutes = Math.floor(timeLeft / 60);
+              const resumeSeconds = timeLeft % 60;
+
+              showToast(
+                "success",
+                "Exam Resumed",
+                `Continuing from where you left off! Time remaining: ${resumeMinutes}:${resumeSeconds
+                  .toString()
+                  .padStart(2, "0")}`
+              );
+
+              console.log(
+                `🔄 Resumed exam state for ${
+                  window.studentRollNumber
+                } - Time: ${resumeMinutes}:${resumeSeconds}, Answers: ${
+                  Object.keys(answers).length
+                }`
+              );
+            } else {
+              console.log("⏰ Saved state too old or invalid, starting fresh");
+              clearLocalExamData();
+            }
+          } catch (error) {
+            console.error("❌ Error restoring exam state:", error);
+            clearLocalExamData();
+          }
+        }
+      }
+
+      function autoSaveAnswer(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        const answer = textarea.value.trim();
+
+        if (!answer || answer === defaultTemplates[qNum].trim()) {
+          return; // Don't auto-save empty or default content
+        }
+
+        answers[qNum] = answer;
+
+        // Enhanced auto-save with timer state and tab switches
+        const examState = {
+          answers: answers,
+          timeLeft: timeLeft,
+          tabSwitchCount: tabSwitchCount,
+          timestamp: Date.now(),
+          studentName: studentName,
+          rollNumber: window.studentRollNumber,
+        };
+
+        localStorage.setItem(
+          `${window.studentRollNumber}_examState`,
+          JSON.stringify(examState)
+        );
+        localStorage.setItem(`${studentName}_answers`, JSON.stringify(answers));
+
+        // Update status to show it's auto-saved
+        const statusDot = document.getElementById("status" + qNum);
+        statusDot.className = "status-dot status-saved";
+
+        console.log(
+          `💾 Auto-saved state for ${
+            window.studentRollNumber
+          } - Time left: ${Math.floor(timeLeft / 60)}:${timeLeft % 60}`
+        );
+      }
+
+      function saveCurrentExamState() {
+        // Save current exam state including all answers and timer
+        const examState = {
+          answers: answers,
+          timeLeft: timeLeft,
+          tabSwitchCount: tabSwitchCount,
+          timestamp: Date.now(),
+          studentName: studentName,
+          rollNumber: window.studentRollNumber,
+        };
+
+        localStorage.setItem(
+          `${window.studentRollNumber}_examState`,
+          JSON.stringify(examState)
+        );
+      }
+
+      function formatCppCode(code) {
+        if (!code || code.trim() === "") return code;
+
+        let lines = code.split("\n");
+        let formatted = [];
+        let indentLevel = 0;
+        const indentSize = 4;
+
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (line === "") {
+            formatted.push("");
+            continue;
+          }
+
+          // Decrease indent for closing braces
+          if (line.startsWith("}")) {
+            indentLevel = Math.max(0, indentLevel - 1);
+          }
+
+          // Add proper indentation
+          let indent = " ".repeat(indentLevel * indentSize);
+
+          // Format specific C++ constructs
+          line = formatCppLine(line);
+
+          formatted.push(indent + line);
+
+          // Increase indent after opening braces
+          if (line.endsWith("{")) {
+            indentLevel++;
+          }
+        }
+
+        return formatted.join("\n");
+      }
+
+      function formatCppLine(line) {
+        // Add space after keywords
+        line = line.replace(/\b(if|for|while|switch)\s*\(/g, "$1 (");
+
+        // Add spaces around compound operators
+        line = line.replace(/(\w)\s*\+=\s*(\w)/g, "$1 += $2");
+        line = line.replace(/(\w)\s*-=\s*(\w)/g, "$1 -= $2");
+        line = line.replace(/(\w)\s*\*=\s*(\w)/g, "$1 *= $2");
+        line = line.replace(/(\w)\s*\/=\s*(\w)/g, "$1 /= $2");
+        line = line.replace(/(\w)\s*%=\s*(\w)/g, "$1 %= $2");
+
+        // Add spaces around single = but NOT compound operators
+        line = line.replace(/([^+\-*\/!<>=])=([^=])/g, "$1 = $2");
+
+        // Add spaces around comparison operators
+        line = line.replace(/([^=!<>])==([^=])/g, "$1 == $2");
+        line = line.replace(/([^=!<>])!=([^=])/g, "$1 != $2");
+        line = line.replace(/([^<])<=([^=])/g, "$1 <= $2");
+        line = line.replace(/([^>])>=([^=])/g, "$1 >= $2");
+        line = line.replace(/([^<>])<([^<=])/g, "$1 < $2");
+        line = line.replace(/([^<>])>([^>=])/g, "$1 > $2");
+
+        // Add space after commas
+        line = line.replace(/,([^\s])/g, ", $1");
+
+        // Add space after semicolons in for loops
+        line = line.replace(/;([^\s])/g, "; $1");
+
+        // Format function declarations
+        line = line.replace(/\)\s*\{/g, ") {");
+
+        // Clean up multiple spaces
+        line = line.replace(/\s+/g, " ");
+
+        return line;
+      }
+
+      function clearAnswer(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        if (textarea.value.trim() === defaultTemplates[qNum].trim()) {
+          showToast(
+            "warning",
+            "Already Empty",
+            "This question is already cleared"
+          );
+          return;
+        }
+
+        textarea.value = defaultTemplates[qNum];
+        updateQuestionStatus(qNum);
+        updateCompletedCount();
+        showToast(
+          "success",
+          "Answer Cleared",
+          `Question ${qNum} has been reset`
+        );
+
+        // Gentle encouragement for Richa when clearing
+        if (window.studentRollNumber === "25MCSS02") {
+          setTimeout(() => {
+            showRichaMessage("Fresh start! 💪");
+          }, 300);
+        }
+      }
+
+      function runCode(qNum) {
+        const textarea = document.getElementById("q" + qNum);
+        let code = textarea.value.trim();
+        const outputDiv = document.getElementById("output" + qNum);
+
+        if (!code || code === defaultTemplates[qNum].trim()) {
+          showToast(
+            "warning",
+            "No Code to Run",
+            "Please write some code before testing"
+          );
+          return;
+        }
+
+        // Auto-format code before running
+        code = formatCppCode(code);
+        textarea.value = code;
+
+        showToast(
+          "info",
+          "Running Tests",
+          "Compiling and testing your code..."
+        );
+        outputDiv.innerHTML =
+          '<div style="color: #3b82f6;">🔄 Compiling and testing...</div>';
+        outputDiv.style.display = "block";
+
+        fetch("/api/test-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questionNumber: qNum,
+            code: code,
+            studentName: window.studentName || studentName,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            displayTestResults(qNum, data);
+            if (data.error) {
+              showToast(
+                "error",
+                "Compilation Error",
+                "Check the output panel for details"
+              );
+            } else {
+              const passedTests = data.tests
+                ? data.tests.filter((t) => t.passed).length
+                : 0;
+              const totalTests = data.tests ? data.tests.length : 0;
+              showToast(
+                "success",
+                "Tests Complete",
+                `${passedTests}/${totalTests} test cases passed`
+              );
+            }
+          })
+          .catch((error) => {
+            outputDiv.innerHTML = `<div style="color: #ef4444;">❌ Error: ${error.message}</div>`;
+            showToast(
+              "error",
+              "Connection Error",
+              "Failed to run tests. Please try again."
+            );
+          });
+      }
+
+      function displayTestResults(qNum, results) {
+        const outputDiv = document.getElementById("output" + qNum);
+
+        if (results.error) {
+          outputDiv.innerHTML = `
                     <div class="output-header">
                         <span style="color: #ef4444;">❌</span>
                         <span>Compilation Error</span>
                     </div>
                     <pre style="color: #ef4444; white-space: pre-wrap;">${results.error}</pre>
                 `;
-                return;
-            }
-            
-            let html = '';
-            let allPassed = true;
-            let passedCount = 0;
-            
-            if (results.tests && results.tests.length > 0) {
-                results.tests.forEach((test, index) => {
-                    const passed = test.passed;
-                    if (passed) passedCount++;
-                    allPassed = allPassed && passed;
-                    
-                    html += `
-                        <div class="test-result ${passed ? 'test-pass' : 'test-fail'}">
+          return;
+        }
+
+        let html = "";
+        let allPassed = true;
+        let passedCount = 0;
+
+        if (results.tests && results.tests.length > 0) {
+          results.tests.forEach((test, index) => {
+            const passed = test.passed;
+            if (passed) passedCount++;
+            allPassed = allPassed && passed;
+
+            html += `
+                        <div class="test-result ${
+                          passed ? "test-pass" : "test-fail"
+                        }">
                             <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.5rem;">
-                                <span>${passed ? '✅' : '❌'} Test Case ${index + 1}</span>
-                                <span>${test.points}/${test.points || 10} pts</span>
+                                <span>${passed ? "✅" : "❌"} Test Case ${
+              index + 1
+            }</span>
+                                <span>${test.points}/${
+              test.points || 10
+            } pts</span>
                             </div>
                             <div style="font-size: 0.8rem; opacity: 0.9;">
-                                <strong>Input:</strong> <code>${test.input || 'Hidden'}</code><br>
-                                <strong>Expected:</strong> <code>${test.expected}</code><br>
-                                <strong>Your Output:</strong> <code>${test.actual}</code>
+                                <strong>Input:</strong> <code>${
+                                  test.input || "Hidden"
+                                }</code><br>
+                                <strong>Expected:</strong> <code>${
+                                  test.expected
+                                }</code><br>
+                                <strong>Your Output:</strong> <code>${
+                                  test.actual
+                                }</code>
                             </div>
                         </div>
                     `;
-                });
-                
-                const totalScore = results.tests.reduce((sum, test) => sum + (test.passed ? test.points : 0), 0);
-                const maxScore = results.tests.reduce((sum, test) => sum + test.points, 0);
-                
-                const summaryIcon = allPassed ? '🎉' : (passedCount > 0 ? '⚡' : '❌');
-                const summaryText = allPassed ? 'All tests passed!' : 
-                                   passedCount > 0 ? `${passedCount}/${results.tests.length} tests passed` : 
-                                   'All tests failed';
-                
-                html = `
+          });
+
+          const totalScore = results.tests.reduce(
+            (sum, test) => sum + (test.passed ? test.points : 0),
+            0
+          );
+          const maxScore = results.tests.reduce(
+            (sum, test) => sum + test.points,
+            0
+          );
+
+          const summaryIcon = allPassed ? "🎉" : passedCount > 0 ? "⚡" : "❌";
+          const summaryText = allPassed
+            ? "All tests passed!"
+            : passedCount > 0
+            ? `${passedCount}/${results.tests.length} tests passed`
+            : "All tests failed";
+
+          html =
+            `
                     <div class="output-header">
                         <span>${summaryIcon}</span>
                         <span>${summaryText}</span>
                     </div>
                     <div class="test-summary">
                         <div style="font-weight: 600; margin-bottom: 0.5rem;">Score: ${totalScore}/${maxScore} points</div>
-                        <div style="font-size: 0.875rem; opacity: 0.8;">Accuracy: ${maxScore > 0 ? Math.round((totalScore/maxScore)*100) : 0}%</div>
+                        <div style="font-size: 0.875rem; opacity: 0.8;">Accuracy: ${
+                          maxScore > 0
+                            ? Math.round((totalScore / maxScore) * 100)
+                            : 0
+                        }%</div>
                     </div>
                 ` + html;
-            }
-            
-            outputDiv.innerHTML = html;
-            
-            // Gentle celebration for Richa on successful runs
-            if (window.studentRollNumber === '25MCSS02' && passedCount > 0) {
-                richaSuccessCelebration(passedCount, results.tests.length);
-            }
         }
 
-        function submitTest() {
-            const submitBtn = document.querySelector('.btn-submit');
-            const originalText = submitBtn.innerHTML;
-            
-            examSecurityActive = false;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loading-spinner"></span>Submitting...';
-            
-            for (let i = 1; i <= 3; i++) {
-                answers[i] = document.getElementById("q" + i).value.trim();
+        outputDiv.innerHTML = html;
+
+        // Gentle celebration for Richa on successful runs
+        if (window.studentRollNumber === "25MCSS02" && passedCount > 0) {
+          richaSuccessCelebration(passedCount, results.tests.length);
+        }
+      }
+
+      function submitTest() {
+        const submitBtn = document.querySelector(".btn-submit");
+        const originalText = submitBtn.innerHTML;
+
+        examSecurityActive = false;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML =
+          '<span class="loading-spinner"></span>Submitting...';
+
+        for (let i = 1; i <= 3; i++) {
+          answers[i] = document.getElementById("q" + i).value.trim();
+        }
+
+        const submissionData = {
+          name: window.studentName || studentName,
+          rollNumber: window.studentRollNumber,
+          answers: answers,
+          mcqAnswers: {},
+          timestamp: new Date().toISOString(),
+          tabSwitchCount: tabSwitchCount,
+        };
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+        fetch("/api/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+          },
+          body: JSON.stringify(submissionData),
+          signal: controller.signal,
+        })
+          .then((response) => {
+            clearTimeout(timeoutId);
+            if (!response.ok)
+              throw new Error(`Server error: ${response.status}`);
+            return response.json();
+          })
+          .then((data) => {
+            clearInterval(timer);
+            if (data.error) throw new Error(data.details || data.error);
+            showSuccessOverlay(data);
+          })
+          .catch((error) => {
+            clearTimeout(timeoutId);
+            examSecurityActive = true;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+
+            let message = "Please try again";
+            let retryDelay = 2000;
+
+            if (error.name === "AbortError") {
+              message = "Server timeout. Retrying automatically...";
+              retryDelay = 5000;
+            } else if (error.message && error.message.includes("503")) {
+              message = "Server busy. Retrying in 10 seconds...";
+              retryDelay = 10000;
+            } else if (error.message && error.message.includes("409")) {
+              message = "Already submitted. Cannot resubmit.";
+              submitBtn.disabled = true;
+              return;
             }
 
-            const submissionData = {
-                name: window.studentName || studentName,
-                rollNumber: window.studentRollNumber,
-                answers: answers,
-                mcqAnswers: {},
-                timestamp: new Date().toISOString(),
-                tabSwitchCount: tabSwitchCount
-            };
+            showToast("error", "Submission Failed", message);
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000);
+            // Auto-retry for server errors
+            if (
+              error.name === "AbortError" ||
+              (error.message && error.message.includes("503"))
+            ) {
+              setTimeout(() => {
+                showToast("info", "Retrying...", "Attempting to submit again");
+                submitTest();
+              }, retryDelay);
+            }
+          });
+      }
 
-            fetch("/api/submit", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache"
-                },
-                body: JSON.stringify(submissionData),
-                signal: controller.signal
-            })
-            .then(response => {
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`Server error: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                clearInterval(timer);
-                if (data.error) throw new Error(data.details || data.error);
-                showSuccessOverlay(data);
-            })
-            .catch(error => {
-                clearTimeout(timeoutId);
-                examSecurityActive = true;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-                
-                let message = 'Please try again';
-                let retryDelay = 2000;
-                
-                if (error.name === 'AbortError') {
-                    message = 'Server timeout. Retrying automatically...';
-                    retryDelay = 5000;
-                } else if (error.message && error.message.includes('503')) {
-                    message = 'Server busy. Retrying in 10 seconds...';
-                    retryDelay = 10000;
-                } else if (error.message && error.message.includes('409')) {
-                    message = 'Already submitted. Cannot resubmit.';
-                    submitBtn.disabled = true;
-                    return;
-                }
-                
-                showToast('error', 'Submission Failed', message);
-                
-                // Auto-retry for server errors
-                if (error.name === 'AbortError' || (error.message && error.message.includes('503'))) {
-                    setTimeout(() => {
-                        showToast('info', 'Retrying...', 'Attempting to submit again');
-                        submitTest();
-                    }, retryDelay);
-                }
-            });
+      function enterFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch((err) => {
+            console.log("Fullscreen request failed:", err);
+            showToast(
+              "warning",
+              "Fullscreen Failed",
+              "Please manually enter fullscreen mode (F11)"
+            );
+          });
         }
-        
-        function enterFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log('Fullscreen request failed:', err);
-                    showToast('warning', 'Fullscreen Failed', 'Please manually enter fullscreen mode (F11)');
-                });
-            }
+      }
+
+      function exitFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
         }
-        
-        function exitFullscreen() {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-        }
-        
-        function showSuccessOverlay(data) {
-            // Exit fullscreen when exam is complete
-            exitFullscreen();
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'success-overlay';
-            overlay.style.display = 'flex';
-            
-            const percentage = data.totalScore && data.maxScore ? 
-                ((data.totalScore / data.maxScore) * 100).toFixed(1) : '0';
-            
-            // Special celebration for Richa
-            if (window.studentRollNumber === '25MCSS02') {
-                overlay.innerHTML = `
+      }
+
+      function showSuccessOverlay(data) {
+        // Exit fullscreen when exam is complete
+        exitFullscreen();
+
+        const overlay = document.createElement("div");
+        overlay.className = "success-overlay";
+        overlay.style.display = "flex";
+
+        const percentage =
+          data.totalScore && data.maxScore
+            ? ((data.totalScore / data.maxScore) * 100).toFixed(1)
+            : "0";
+
+        // Special celebration for Richa
+        if (window.studentRollNumber === "25MCSS02") {
+          overlay.innerHTML = `
                     <div class="success-content">
                         <div class="success-icon">🎉</div>
                         <h1 class="success-title">Excellent Work, Richa!</h1>
                         <p class="success-message">You've completed your exam successfully! 🌟</p>
                         <div class="success-details">
                             <h3 style="margin-bottom: 1rem;">Your Results</h3>
-                            <p><strong>Score:</strong> ${data.totalScore || 0}/${data.maxScore || 100} (${percentage}%)</p>
+                            <p><strong>Score:</strong> ${
+                              data.totalScore || 0
+                            }/${data.maxScore || 100} (${percentage}%)</p>
                             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                         </div>
                         <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>
                     </div>
-                    ${Array.from({length: 9}, (_, i) => '<div class="confetti"></div>').join('')}
+                    ${Array.from(
+                      { length: 9 },
+                      (_, i) => '<div class="confetti"></div>'
+                    ).join("")}
                 `;
-                
-                createFloatingEmojis(['🎉', '✨', '💖']);
-                
-                setTimeout(() => {
-                    window.close();
-                    window.location.href = 'about:blank';
-                }, 5000);
-            } else {
-                overlay.innerHTML = `
+
+          createFloatingEmojis(["🎉", "✨", "💖"]);
+
+          setTimeout(() => {
+            window.close();
+            window.location.href = "about:blank";
+          }, 5000);
+        } else {
+          overlay.innerHTML = `
                     <div class="success-content">
                         <div class="success-icon">🎉</div>
                         <h1 class="success-title">Exam Submitted!</h1>
                         <p class="success-message">Congratulations! Your assessment has been submitted successfully.</p>
                         <div class="success-details">
                             <h3 style="margin-bottom: 1rem;">Your Results</h3>
-                            <p><strong>Score:</strong> ${data.totalScore || 0}/${data.maxScore || 100} (${percentage}%)</p>
+                            <p><strong>Score:</strong> ${
+                              data.totalScore || 0
+                            }/${data.maxScore || 100} (${percentage}%)</p>
                             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                         </div>
                         <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>
                     </div>
-                    ${Array.from({length: 9}, (_, i) => '<div class="confetti"></div>').join('')}
+                    ${Array.from(
+                      { length: 9 },
+                      (_, i) => '<div class="confetti"></div>'
+                    ).join("")}
                 `;
-                
-                setTimeout(() => {
-                    window.close();
-                    window.location.href = 'about:blank';
-                }, 5000);
-            }
-            
-            document.body.appendChild(overlay);
+
+          setTimeout(() => {
+            window.close();
+            window.location.href = "about:blank";
+          }, 5000);
         }
+
+        document.body.appendChild(overlay);
+      }
     </script>
-</body>
+  </body>
 </html>

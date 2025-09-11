@@ -13,19 +13,19 @@ const app = express();
 // NOTE: Clustering is currently enabled only in production mode.
 // To enable clustering in development or testing, change the condition below.
 // Example: if (cluster.isMaster) { ... }
-if (cluster.isMaster && process.env.NODE_ENV === 'production') {
+if (cluster.isMaster && process.env.NODE_ENV === "production") {
   const numCPUs = os.cpus().length;
   console.log(`🚀 Master process starting ${numCPUs} workers...`);
-  
+
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
-  
-  cluster.on('exit', (worker, code, signal) => {
+
+  cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died. Restarting...`);
     cluster.fork();
   });
-  
+
   return;
 }
 
@@ -49,55 +49,45 @@ const submissionLimiter = rateLimit({
 
 // Initialize compiler pool
 let compilerPool;
-if (!cluster.isMaster || process.env.NODE_ENV !== 'production') {
+if (!cluster.isMaster || process.env.NODE_ENV !== "production") {
   compilerPool = new CompilerPool();
 }
-
 
 app.use(limiter);
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
 // Performance optimizations
-app.set('trust proxy', 1);
-app.disable('x-powered-by');
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
 
 // Connection pooling and keep-alive
 app.use((req, res, next) => {
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Keep-Alive', 'timeout=5, max=1000');
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("Keep-Alive", "timeout=5, max=1000");
   next();
 });
 
-
-
 // Serve admin.html
-app.get('/admin.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
+app.get("/admin.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
 });
 
 // Serve other static files normally
-app.use(express.static('.', {
-  index: false,
-  setHeaders: (res, path) => {
-    if (path.endsWith('admin.html')) {
-      res.status(404).end();
-    }
-  }
-}));
+app.use(
+  express.static(".", {
+    index: false,
+    setHeaders: (res, path) => {
+      if (path.endsWith("admin.html")) {
+        res.status(404).end();
+      }
+    },
+  })
+);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-
-// MCQ Correct Answers
-const mcqAnswers = {
-  mcq1: "b", // 40 20 (ptr points to arr[2]=30, ptr+1=arr[3]=40, ptr-1=arr[1]=20)
-  mcq2: "a", // ELLO L (p points to str[1], so p prints "ELLO", *(p+2) = str[3] = 'L')
-  mcq3: "b", // 3 times (i=0: prints, i=1: prints, i=2: continue, i=3: prints, i=4: break)
-  mcq4: "b", // 7 (mystery(4) = 4 + mystery(2) = 4 + (2 + mystery(0)) = 4 + (2 + 1) = 7)
-  mcq5: "b", // 9 (i=0: arr[0]=1, i=2: arr[2]=3, i=4: arr[4]=5, total=1+3+5=9)
-};
 
 // Student Database
 const STUDENT_DATABASE = {
@@ -161,276 +151,69 @@ try {
   // Directory might already exist, ignore the error
 }
 
-// --- Test Cases ---
-const testCases = {
-  1: [
-    // Q1: Transpose of Matrix
-    { input: [[1,2,3],[4,5,6]], expected: "1 4\n2 5\n3 6", points: 7 },
-    { input: [[1,2],[3,4],[5,6]], expected: "1 3 5\n2 4 6", points: 7 },
-    { input: [[1]], expected: "1", points: 6 },
-    { input: [[1,2,3],[4,5,6],[7,8,9]], expected: "1 4 7\n2 5 8\n3 6 9", points: 7 },
-    { input: [[1,2,3,4]], expected: "1\n2\n3\n4", points: 6 },
-  ],
-  2: [
-    // Q2: Merge Two Sorted Arrays
-    { input: {nums1: [1,2,3], nums2: [2,5,6]}, expected: "1 2 2 3 5 6", points: 7 },
-    { input: {nums1: [1], nums2: []}, expected: "1", points: 7 },
-    { input: {nums1: [], nums2: [1]}, expected: "1", points: 6 },
-    { input: {nums1: [1,3,5], nums2: [2,4,6]}, expected: "1 2 3 4 5 6", points: 7 },
-    { input: {nums1: [4,5,6], nums2: [1,2,3]}, expected: "1 2 3 4 5 6", points: 6 },
-  ],
-  3: [
-    // Q3: Intersection of Two Vectors
-    { input: {nums1: [1,2,2,1], nums2: [2,2]}, expected: "2", points: 7 },
-    { input: {nums1: [4,9,5], nums2: [9,4,9,8,4]}, expected: "4 9", points: 7 },
-    { input: {nums1: [1,2,3], nums2: [4,5,6]}, expected: "", points: 6 },
-    { input: {nums1: [1,2,3,4], nums2: [3,4,5,6]}, expected: "3 4", points: 7 },
-    { input: {nums1: [1], nums2: [1,1]}, expected: "1", points: 6 },
-  ],
-};
+// --- API Endpoints ---
 
-// Limited test cases for testing (first 3 only)
-const limitedTestCases = {
-  1: testCases[1].slice(0, 3),
-  2: testCases[2].slice(0, 3),
-  3: testCases[3].slice(0, 3),
-};
+// Auto-grading function for coding questions
+async function autoGrade(studentName, answers) {
+  const results = {};
+  let totalScore = 0;
+  const maxScore = 100; // 33+33+34 points distributed across 3 questions
 
-// --- Load-Balanced Auto-Grading ---
-function autoGrade(studentName, answers) {
-  return new Promise(async (resolve, reject) => {
-    let totalScore = 0;
-    let maxScore = 0;
-    let results = {};
+  for (let questionNumber = 1; questionNumber <= 3; questionNumber++) {
+    const code = answers[questionNumber];
 
-    const questions = Object.keys(answers).filter(
-      (q) => answers[q] && answers[q].trim() && parseInt(q) <= 3
-    );
-
-    if (questions.length === 0) {
-      return resolve({
-        totalScore: 0,
-        maxScore: 100,
-        results: {},
-        error: "No valid answers submitted",
-      });
+    if (!code || code.trim() === "") {
+      results[questionNumber] = {
+        score: 0,
+        maxScore: questionNumber === 3 ? 34 : 33,
+        tests: [],
+        message: "No code submitted",
+      };
+      continue;
     }
 
     try {
-      // Process all questions concurrently using compiler pool
-      const compilationPromises = questions.map(async (qNum) => {
-        const tests = testCases[qNum];
-        if (!tests) {
-          return {
-            qNum,
-            score: 0,
-            error: "No test cases available for this question",
-            tests: [],
-          };
-        }
-
-        try {
-          const result = await compilerPool.compile(qNum, answers[qNum], studentName);
-          return { qNum, ...result };
-        } catch (error) {
-          console.error(`Compilation error for Q${qNum}:`, error.message);
-          return {
-            qNum,
-            score: 0,
-            error: error.message,
-            tests: [],
-          };
-        }
-      });
-
-      const compilationResults = await Promise.all(compilationPromises);
-      
-      // Calculate scores and organize results
-      compilationResults.forEach(result => {
-        totalScore += result.score || 0;
-        const tests = testCases[result.qNum];
-        if (tests) {
-          maxScore += tests.reduce((sum, test) => sum + test.points, 0);
-        }
-        results[result.qNum] = {
-          score: result.score || 0,
-          error: result.error,
-          tests: result.tests || [],
-          complexity: result.complexity || 'O(n)',
-          optimizationScore: result.optimizationScore || 100
-        };
-      });
-
-      resolve({
-        totalScore,
-        maxScore: Math.max(maxScore, 100),
-        results,
-      });
+      // Use compiler pool to test the code
+      const result = await compilerPool.compile(
+        questionNumber,
+        code,
+        studentName
+      );
+      results[questionNumber] = result;
+      totalScore += result.score;
     } catch (error) {
-      console.error('Auto-grading error:', error);
-      reject(error);
-    }
-  });
-}
-
-// Function to grade MCQ answers
-function gradeMCQ(studentMCQAnswers) {
-  let mcqScore = 0;
-  let mcqMaxScore = 25; // 5 questions × 5 points each
-  let mcqResults = {};
-
-  for (let i = 1; i <= 5; i++) {
-    const questionKey = `mcq${i}`;
-    const studentAnswer = studentMCQAnswers
-      ? studentMCQAnswers[questionKey]
-      : null;
-    const correctAnswer = mcqAnswers[questionKey];
-
-    if (studentAnswer === correctAnswer) {
-      mcqScore += 5;
-      mcqResults[questionKey] = {
-        score: 5,
-        maxScore: 5,
-        studentAnswer,
-        correctAnswer,
-        status: "Correct",
-      };
-    } else {
-      mcqResults[questionKey] = {
+      console.error(
+        `❌ Error grading Q${questionNumber} for ${studentName}:`,
+        error.message
+      );
+      results[questionNumber] = {
         score: 0,
-        maxScore: 5,
-        studentAnswer: studentAnswer || "Not answered",
-        correctAnswer,
-        status: "Incorrect",
+        maxScore: questionNumber === 3 ? 34 : 33,
+        tests: [],
+        message: "Compilation/Runtime Error: " + error.message,
       };
     }
   }
 
   return {
-    mcqScore,
-    mcqMaxScore,
-    mcqResults,
+    totalScore,
+    maxScore,
+    results,
   };
 }
 
-// --- Helper Functions ---
-function cleanupFiles(fileList) {
-  fileList.forEach((file) => {
-    if (fs.existsSync(file)) fs.unlinkSync(file);
-  });
-}
+// --- API Endpoints ---
 
-function createFullCode(qNum, studentCode) {
-  // Function to check if student provided a function implementation
-  const hasFunctionImplementation = (code, functionName) => {
-    const regex = new RegExp(`\\b${functionName}\\s*\\([^)]*\\)\\s*\\{`, "i");
-    return regex.test(
-      code.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "")
-    );
-  };
-
-  const functionNames = {
-    1: "transpose",
-    2: "mergeSortedArrays",
-    3: "intersection",
-  };
-
-  const defaultImplementations = {
-    1: `vector<vector<int>> transpose(vector<vector<int>>& matrix) {
-    vector<vector<int>> result;
-    return result; // Default implementation
-}`,
-    2: `vector<int> mergeSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-    vector<int> result;
-    return result; // Default implementation
-}`,
-    3: `vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-    vector<int> result;
-    return result; // Default implementation
-}`,
-  };
-
-  const headers = {
-    1: `#include <iostream>
-#include <vector>
-using namespace std;`,
-    2: `#include <iostream>
-#include <vector>
-using namespace std;`,
-    3: `#include <iostream>
-#include <vector>
-#include <unordered_set>
-using namespace std;`,
-  };
-
-  const mainFunctions = {
-    1: `int main() {
-    vector<vector<int>> m1={{1,2,3},{4,5,6}}; auto r1=transpose(m1); for(int i=0;i<r1.size();i++){for(int j=0;j<r1[i].size();j++){cout<<r1[i][j];if(j<r1[i].size()-1)cout<<" ";} if(i<r1.size()-1)cout<<"\\n";} cout<<endl;
-    vector<vector<int>> m2={{1,2},{3,4},{5,6}}; auto r2=transpose(m2); for(int i=0;i<r2.size();i++){for(int j=0;j<r2[i].size();j++){cout<<r2[i][j];if(j<r2[i].size()-1)cout<<" ";} if(i<r2.size()-1)cout<<"\\n";} cout<<endl;
-    vector<vector<int>> m3={{1}}; auto r3=transpose(m3); for(int i=0;i<r3.size();i++){for(int j=0;j<r3[i].size();j++){cout<<r3[i][j];if(j<r3[i].size()-1)cout<<" ";} if(i<r3.size()-1)cout<<"\\n";} cout<<endl;
-    vector<vector<int>> m4={{1,2,3},{4,5,6},{7,8,9}}; auto r4=transpose(m4); for(int i=0;i<r4.size();i++){for(int j=0;j<r4[i].size();j++){cout<<r4[i][j];if(j<r4[i].size()-1)cout<<" ";} if(i<r4.size()-1)cout<<"\\n";} cout<<endl;
-    vector<vector<int>> m5={{1,2,3,4}}; auto r5=transpose(m5); for(int i=0;i<r5.size();i++){for(int j=0;j<r5[i].size();j++){cout<<r5[i][j];if(j<r5[i].size()-1)cout<<" ";} if(i<r5.size()-1)cout<<"\\n";} cout<<endl;
-    return 0;
-}`,
-    2: `int main() {
-    vector<int> a1={1,2,3},b1={2,5,6}; auto r1=mergeSortedArrays(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a2={1},b2={}; auto r2=mergeSortedArrays(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a3={},b3={1}; auto r3=mergeSortedArrays(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a4={1,3,5},b4={2,4,6}; auto r4=mergeSortedArrays(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a5={4,5,6},b5={1,2,3}; auto r5=mergeSortedArrays(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
-    return 0;
-}`,
-    3: `int main() {
-    vector<int> a1={1,2,2,1},b1={2,2}; auto r1=intersection(a1,b1); for(int i=0;i<r1.size();i++){cout<<r1[i];if(i<r1.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a2={4,9,5},b2={9,4,9,8,4}; auto r2=intersection(a2,b2); for(int i=0;i<r2.size();i++){cout<<r2[i];if(i<r2.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a3={1,2,3},b3={4,5,6}; auto r3=intersection(a3,b3); for(int i=0;i<r3.size();i++){cout<<r3[i];if(i<r3.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a4={1,2,3,4},b4={3,4,5,6}; auto r4=intersection(a4,b4); for(int i=0;i<r4.size();i++){cout<<r4[i];if(i<r4.size()-1)cout<<" ";} cout<<endl;
-    vector<int> a5={1},b5={1,1}; auto r5=intersection(a5,b5); for(int i=0;i<r5.size();i++){cout<<r5[i];if(i<r5.size()-1)cout<<" ";} cout<<endl;
-    return 0;
-}`,
-  };
-
-  const functionName = functionNames[qNum];
-  const hasFunction = hasFunctionImplementation(studentCode, functionName);
-
-  // If student provided implementation, use it; otherwise use default
-  const codeToUse = hasFunction ? studentCode : defaultImplementations[qNum];
-
-  return `${headers[qNum]}
-
-${codeToUse}
-
-${mainFunctions[qNum]}`;
-}
-
-function evaluateOutput(qNum, stdout, tests) {
-  const lines = stdout.trim().split("\n");
-  let score = 0;
-  let testResults = [];
-
-  tests.forEach((test, i) => {
-    const expected = test.expected.toString().trim();
-    const actual = lines[i] ? lines[i].trim() : "No output";
-    const passed = actual === expected;
-    const points = passed ? test.points : 0;
-    score += points;
-
-    testResults.push({
-      testCase: i + 1,
-      expected,
-      actual,
-      passed,
-      points,
-    });
-  });
-
-  return { score, tests: testResults };
-}
-
-// --- Optimized API Endpoints ---
+// Submit answers endpoint
 app.post("/api/submit", submissionLimiter, async (req, res) => {
   const startTime = Date.now();
-  const { name, rollNumber, answers, mcqAnswers: studentMCQAnswers, tabSwitchCount } = req.body;
+  const {
+    name,
+    rollNumber,
+    answers,
+    mcqAnswers: studentMCQAnswers,
+    tabSwitchCount,
+  } = req.body;
 
   if (!name || name.trim() === "") {
     return res.status(400).json({
@@ -453,7 +236,7 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
       return res.status(409).json({
         error: "Duplicate submission",
         details: "This student has already submitted",
-        existing: existingSubmission
+        existing: existingSubmission,
       });
     }
 
@@ -461,9 +244,12 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
     const codingResult = answers
       ? await Promise.race([
           autoGrade(name, answers),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Server busy, please retry')), 30000)
-          )
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Server busy, please retry")),
+              30000
+            )
+          ),
         ])
       : {
           totalScore: 0,
@@ -471,17 +257,17 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
           results: {},
         };
 
-    const mcqResult = gradeMCQ(studentMCQAnswers);
-
     // Calculate optimization bonus
     let optimizationBonus = 0;
     let avgOptimization = 0;
     if (codingResult.results) {
       const optimizationScores = Object.values(codingResult.results)
-        .map(r => r.optimizationScore || 100)
-        .filter(s => s > 0);
+        .map((r) => r.optimizationScore || 100)
+        .filter((s) => s > 0);
       if (optimizationScores.length > 0) {
-        avgOptimization = optimizationScores.reduce((a, b) => a + b, 0) / optimizationScores.length;
+        avgOptimization =
+          optimizationScores.reduce((a, b) => a + b, 0) /
+          optimizationScores.length;
         optimizationBonus = Math.floor(avgOptimization / 10); // 0-10 bonus points
       }
     }
@@ -505,34 +291,39 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
     };
 
     const savedResult = await db.saveResult(finalResult);
-    
+
     // Log performance metrics
     const processingTime = Date.now() - startTime;
-    console.log(`✅ Submission processed: ${rollNumber} in ${processingTime}ms`);
-    
+    console.log(
+      `✅ Submission processed: ${rollNumber} in ${processingTime}ms`
+    );
+
     res.status(201).json({
       ...savedResult,
-      processingTime
+      processingTime,
     });
   } catch (error) {
     const processingTime = Date.now() - startTime;
-    console.error(`❌ Submission failed: ${req.body.rollNumber} in ${processingTime}ms -`, error.message);
-    
-    if (error.message.includes('timeout') || error.message.includes('busy')) {
-      res.status(503).json({ 
-        error: "Server busy", 
+    console.error(
+      `❌ Submission failed: ${req.body.rollNumber} in ${processingTime}ms -`,
+      error.message
+    );
+
+    if (error.message.includes("timeout") || error.message.includes("busy")) {
+      res.status(503).json({
+        error: "Server busy",
         details: "High load detected. Please wait 10 seconds and try again.",
-        retryAfter: 10
+        retryAfter: 10,
       });
-    } else if (error.message.includes('Duplicate')) {
-      res.status(409).json({ 
-        error: "Already submitted", 
-        details: error.message
+    } else if (error.message.includes("Duplicate")) {
+      res.status(409).json({
+        error: "Already submitted",
+        details: error.message,
       });
     } else {
-      res.status(500).json({ 
-        error: "Processing failed", 
-        details: "Please try again in a moment"
+      res.status(500).json({
+        error: "Processing failed",
+        details: "Please try again in a moment",
       });
     }
   }
@@ -552,22 +343,22 @@ app.get("/api/results", async (req, res) => {
 // Check if student already submitted
 app.post("/api/check-submission", async (req, res) => {
   const { rollNumber } = req.body;
-  
+
   if (!rollNumber || !rollNumber.match(/^25MCS[AS]\d{2}$/)) {
     return res.status(400).json({ error: "Valid roll number is required" });
   }
-  
+
   try {
     const existingSubmission = await db.checkExistingSubmission(rollNumber);
-    
+
     if (existingSubmission) {
       res.json({
         alreadySubmitted: true,
-        submission: existingSubmission
+        submission: existingSubmission,
       });
     } else {
       res.json({
-        alreadySubmitted: false
+        alreadySubmitted: false,
       });
     }
   } catch (error) {
@@ -576,24 +367,32 @@ app.post("/api/check-submission", async (req, res) => {
 });
 
 // Load-balanced test code endpoint (limited test cases)
-app.post("/api/test-code", rateLimit({
-  windowMs: 60 * 1000,
-  max: 15, // Increased limit with load balancing
-  message: { error: "Too many test runs" }
-}), async (req, res) => {
-  const { questionNumber, code, studentName } = req.body;
-  
-  if (!questionNumber || !code) {
-    return res.status(400).json({ error: "Missing question number or code" });
+app.post(
+  "/api/test-code",
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 20, // Reasonable limit for exam use
+    message: { error: "Too many test runs" },
+  }),
+  async (req, res) => {
+    const { questionNumber, code, studentName } = req.body;
+
+    if (!questionNumber || !code) {
+      return res.status(400).json({ error: "Missing question number or code" });
+    }
+
+    try {
+      const result = await compilerPool.compileWithLimitedTests(
+        questionNumber,
+        code,
+        studentName || "test"
+      );
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-  
-  try {
-    const result = await compilerPool.compileWithLimitedTests(questionNumber, code, studentName || "test");
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+);
 
 // Compiler pool status endpoint
 app.get("/api/compiler-status", (req, res) => {
@@ -612,6 +411,7 @@ app.delete("/api/results/clear", async (req, res) => {
       message: result.message,
       deletedCount: result.deletedCount,
       timestamp: new Date().toISOString(),
+      warning: "Students may still have saved exam state in browser localStorage. Ask them to use incognito mode or clear browser data for completely fresh exams."
     });
   } catch (error) {
     res
@@ -620,18 +420,27 @@ app.delete("/api/results/clear", async (req, res) => {
   }
 });
 
+// Endpoint to clear localStorage (for fresh exam start)
+app.post("/api/clear-session", (req, res) => {
+  res.json({
+    success: true,
+    message: "Client should clear localStorage",
+    clearLocalStorage: true
+  });
+});
+
 // Admin endpoint to delete individual submission
 app.delete("/api/results/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!id || isNaN(parseInt(id))) {
-      return res.status(400).json({ 
-        error: "Invalid ID", 
-        details: "ID must be a valid number" 
+      return res.status(400).json({
+        error: "Invalid ID",
+        details: "ID must be a valid number",
       });
     }
-    
+
     const result = await db.deleteResult(id);
     res.json({
       success: true,
@@ -652,12 +461,12 @@ const PORT = process.env.PORT || 3000;
 // Verify database connection and start server
 async function startServer() {
   try {
-    // Test database connection
-    await db.getResults();
-    console.log("✅ Database connected successfully");
+    // Wait for database initialization to complete
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("✅ Database initialized successfully");
 
     const server = app.listen(PORT, "0.0.0.0", () => {
-      const workerId = cluster.worker ? cluster.worker.id : 'Master';
+      const workerId = cluster.worker ? cluster.worker.id : "Master";
       console.log(`🚀 Worker ${workerId} running on port ${PORT}`);
       if (!cluster.worker) {
         console.log(`   Local:    http://localhost:${PORT}`);
@@ -665,24 +474,23 @@ async function startServer() {
         console.log(`   Status:   Ready for high-load submissions`);
       }
     });
-    
+
     // Optimize server settings for high load
     server.keepAliveTimeout = 65000;
     server.headersTimeout = 66000;
     server.maxConnections = 1000;
-    
+
     // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('🔄 Graceful shutdown initiated...');
+    process.on("SIGTERM", () => {
+      console.log("🔄 Graceful shutdown initiated...");
       if (compilerPool) {
         compilerPool.shutdown();
       }
       server.close(() => {
-        console.log('✅ Server closed');
+        console.log("✅ Server closed");
         process.exit(0);
       });
     });
-    
   } catch (error) {
     console.error("❌ Failed to connect to database:", error.message);
     process.exit(1);

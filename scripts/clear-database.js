@@ -68,6 +68,8 @@ function clearDatabase() {
                 reject(closeErr);
               } else {
                 console.log("📫 Database connection closed");
+                console.log("⚠️  Note: Students may still have saved exam state in browser localStorage");
+                console.log("💡 To completely reset: Ask students to clear browser data or use incognito mode");
                 resolve();
               }
             });
@@ -88,6 +90,10 @@ async function main() {
       await clearDatabase();
       console.log("\n✨ Database cleared successfully!");
       console.log("📝 Ready for fresh exam submissions");
+      console.log("\n⚠️  IMPORTANT: Students may still have saved exam state in their browsers.");
+      console.log("💡 For completely fresh exams, ask students to:");
+      console.log("   - Use incognito/private browsing mode, OR");
+      console.log("   - Clear browser data (localStorage) for this site");
     } else {
       console.log("\n❌ Operation cancelled. Database remains unchanged.");
     }
