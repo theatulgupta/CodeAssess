@@ -2,36 +2,37 @@ const http = require("http");
 
 // Test solutions for the new questions
 const testCode = {
-  1: `int secondLargest(vector<int>& arr) {
-    if (arr.size() < 2) return -1;
-    sort(arr.begin(), arr.end(), greater<int>());
-    for (int i = 1; i < arr.size(); i++) {
-        if (arr[i] != arr[0]) return arr[i];
-    }
-    return -1;
-}`,
-  2: `int countGreaterThanPrevious(vector<int>& arr) {
-    if (arr.empty()) return 0;
-    int cnt = 1;  
-    int max_so_far = arr[0];
-    for (int i = 1; i < arr.size(); i++) {
-        if (arr[i] > max_so_far) {
-            cnt++;
-            max_so_far = arr[i];
+  1: `void transposeMatrix(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            swap(matrix[i][j], matrix[j][i]);
         }
     }
-    return cnt;
 }`,
-  3: `int rowWithMaxOnes(vector<vector<int>>& mat) {
-    int maxOnes = -1, rowIndex = -1;
-    for (int i = 0; i < mat.size(); i++) {
-        int ones = count(mat[i].begin(), mat[i].end(), 1);
-        if (ones > maxOnes) {
-            maxOnes = ones;
-            rowIndex = i;
+  2: `vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) {
+    vector<int> result;
+    int i = 0, j = 0;
+    while (i < arr1.size() && j < arr2.size()) {
+        if (arr1[i] <= arr2[j]) {
+            result.push_back(arr1[i++]);
+        } else {
+            result.push_back(arr2[j++]);
         }
     }
-    return rowIndex;
+    while (i < arr1.size()) result.push_back(arr1[i++]);
+    while (j < arr2.size()) result.push_back(arr2[j++]);
+    return result;
+}`,
+  3: `vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) {
+    unordered_set<int> set1(arr1.begin(), arr1.end());
+    unordered_set<int> result_set;
+    for (int num : arr2) {
+        if (set1.count(num)) {
+            result_set.insert(num);
+        }
+    }
+    return vector<int>(result_set.begin(), result_set.end());
 }`,
 };
 

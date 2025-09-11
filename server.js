@@ -157,7 +157,7 @@ try {
 async function autoGrade(studentName, answers) {
   const results = {};
   let totalScore = 0;
-  const maxScore = 100; // 33+33+34 points distributed across 3 questions
+  const maxScore = 75; // 25+25+25 points distributed across 3 questions
 
   for (let questionNumber = 1; questionNumber <= 3; questionNumber++) {
     const code = answers[questionNumber];
@@ -165,7 +165,7 @@ async function autoGrade(studentName, answers) {
     if (!code || code.trim() === "") {
       results[questionNumber] = {
         score: 0,
-        maxScore: questionNumber === 3 ? 34 : 33,
+        maxScore: 25,
         tests: [],
         message: "No code submitted",
       };
@@ -411,7 +411,8 @@ app.delete("/api/results/clear", async (req, res) => {
       message: result.message,
       deletedCount: result.deletedCount,
       timestamp: new Date().toISOString(),
-      warning: "Students may still have saved exam state in browser localStorage. Ask them to use incognito mode or clear browser data for completely fresh exams."
+      warning:
+        "Students may still have saved exam state in browser localStorage. Ask them to use incognito mode or clear browser data for completely fresh exams.",
     });
   } catch (error) {
     res
@@ -425,7 +426,7 @@ app.post("/api/clear-session", (req, res) => {
   res.json({
     success: true,
     message: "Client should clear localStorage",
-    clearLocalStorage: true
+    clearLocalStorage: true,
   });
 });
 
