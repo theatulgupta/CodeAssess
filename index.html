@@ -1393,10 +1393,10 @@
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button type="button" class="code-action-btn" onclick="resetCode(1); return false;">
+                <button type="button" class="code-action-btn" data-reset="1">
                   Reset
                 </button>
-                <button type="button" class="code-action-btn" onclick="formatCode(1); return false;">
+                <button type="button" class="code-action-btn" data-format="1">
                   Format
                 </button>
               </div>
@@ -1490,10 +1490,10 @@ int binarySearch(const vector<int>& nums, int target) {
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button type="button" class="code-action-btn" onclick="resetCode(2); return false;">
+                <button type="button" class="code-action-btn" data-reset="2">
                   Reset
                 </button>
-                <button type="button" class="code-action-btn" onclick="formatCode(2); return false;">
+                <button type="button" class="code-action-btn" data-format="2">
                   Format
                 </button>
               </div>
@@ -1591,10 +1591,10 @@ int recursiveArraySum(const vector<int>& nums) {
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button type="button" class="code-action-btn" onclick="resetCode(3); return false;">
+                <button type="button" class="code-action-btn" data-reset="3">
                   Reset
                 </button>
-                <button type="button" class="code-action-btn" onclick="formatCode(3); return false;">
+                <button type="button" class="code-action-btn" data-format="3">
                   Format
                 </button>
               </div>
@@ -3324,6 +3324,31 @@ vector<int> twoSumIndices(const vector<int>& nums, int target) {
 
         document.body.appendChild(overlay);
       }
+
+      // Modern event listeners for Reset and Format buttons (prevents any potential page reload issues)
+      document.addEventListener('DOMContentLoaded', function() {
+        // Reset button event listeners
+        document.querySelectorAll('[data-reset]').forEach(button => {
+          button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const qNum = parseInt(this.getAttribute('data-reset'));
+            resetCode(qNum);
+            return false;
+          });
+        });
+
+        // Format button event listeners  
+        document.querySelectorAll('[data-format]').forEach(button => {
+          button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const qNum = parseInt(this.getAttribute('data-format'));
+            formatCode(qNum);
+            return false;
+          });
+        });
+      });
     </script>
   </body>
 </html>
