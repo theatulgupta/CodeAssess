@@ -16,41 +16,55 @@ class CodeAnalyzer {
     let optimizationScore = 100;
 
     // Question-specific analysis
-    switch (qNum) {
-      case "1": // Matrix Transpose
-        if (nestedLoops >= 2) {
-          complexity = "O(n²)";
-          optimizationScore = 100; // Expected for in-place transpose
+    switch (parseInt(qNum)) {
+      case 1: // Binary Search
+        if (
+          nestedLoops >= 1 ||
+          /for\s*\(|while\s*\(/.test(cleanCode.replace(/\/\/.*$/gm, ""))
+        ) {
+          complexity = "O(n)";
+          optimizationScore = 30; // Linear search instead of binary search
+        } else if (/\/\s*2|>>/.test(cleanCode)) {
+          complexity = "O(log n)";
+          optimizationScore = 100; // Optimal binary search implementation
         } else {
-          optimizationScore = 50; // May not be optimal implementation
+          complexity = "O(log n)";
+          optimizationScore = 85; // Likely binary search but unclear division
         }
         break;
 
-      case "2": // Merge Sorted Arrays
-        if (nestedLoops >= 2 || hasLinearScan) {
-          complexity = "O(n²)";
-          optimizationScore = 30;
-        } else if (hasSorting) {
-          complexity = "O(n log n)";
-          optimizationScore = 60; // Sorting not needed for sorted arrays
+      case 2: // Recursive Array Sum
+        if (/for\s*\(|while\s*\(/.test(cleanCode)) {
+          complexity = "O(n)";
+          optimizationScore = 60; // Iterative solution (not recursive as required)
+        } else if (
+          cleanCode.includes("recursiveArraySum") &&
+          cleanCode.includes("return")
+        ) {
+          complexity = "O(n)";
+          optimizationScore = 100; // Proper recursive implementation
         } else {
-          complexity = "O(n + m)";
-          optimizationScore = 100; // Optimal two-pointer approach
+          complexity = "O(n)";
+          optimizationScore = 75; // Likely recursive but hard to verify
         }
         break;
 
-      case "3": // Array Intersection
+      case 3: // Two Sum with Two Pointers
         if (nestedLoops >= 2 || hasLinearScan) {
           complexity = "O(n²)";
-          optimizationScore = 20;
-        } else if (hasSorting) {
-          complexity = "O(n log n)";
-          optimizationScore = 70;
+          optimizationScore = 20; // Brute force approach
         } else if (hasHashMap) {
-          complexity = "O(n + m)";
-          optimizationScore = 100; // Optimal hash set approach
+          complexity = "O(n)";
+          optimizationScore = 85; // Hash map approach (good but not two pointers)
+        } else if (hasSorting) {
+          complexity = "O(n log n)";
+          optimizationScore = 60; // Sorting then two pointers (but array already sorted)
+        } else if (/left|right|start|end|\+\+|\-\-/.test(cleanCode)) {
+          complexity = "O(n)";
+          optimizationScore = 100; // Optimal two pointers approach
         } else {
-          optimizationScore = 50;
+          complexity = "O(n)";
+          optimizationScore = 70; // Unclear implementation
         }
         break;
     }

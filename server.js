@@ -188,7 +188,7 @@ async function autoGrade(studentName, answers) {
       );
       results[questionNumber] = {
         score: 0,
-        maxScore: questionNumber === 3 ? 34 : 33,
+        maxScore: 25,
         tests: [],
         message: "Compilation/Runtime Error: " + error.message,
       };
@@ -253,11 +253,9 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
         ])
       : {
           totalScore: 0,
-          maxScore: 100,
+          maxScore: 75,
           results: {},
-        };
-
-    // Calculate optimization bonus
+        }; // Calculate optimization bonus
     let optimizationBonus = 0;
     let avgOptimization = 0;
     if (codingResult.results) {
@@ -275,8 +273,8 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
     const finalResult = {
       name,
       rollNumber,
-      totalScore: codingResult.totalScore + optimizationBonus,
-      maxScore: codingResult.maxScore + 10, // Include optimization bonus in max
+      totalScore: codingResult.totalScore,
+      maxScore: codingResult.maxScore, // Total should be 75 (25 per question)
       codingScore: codingResult.totalScore,
       codingMaxScore: codingResult.maxScore,
       optimizationScore: avgOptimization,
