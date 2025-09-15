@@ -1,15 +1,19 @@
-const { Worker } = require('worker_threads');
-const path = require('path');
-const os = require('os');
+const { Worker } = require("worker_threads");
+const path = require("path");
+const os = require("os");
 
 class CompilerPool {
-  constructor(poolSize = Math.max(4, Math.min(os.cpus().length, 8))) {
+  constructor(
+    poolSize = process.env.COMPILER_POOL_SIZE
+      ? parseInt(process.env.COMPILER_POOL_SIZE, 10)
+      : Math.max(4, Math.min(os.cpus().length, 8))
+  ) {
     this.poolSize = poolSize;
     this.workers = [];
     this.queue = [];
     this.activeJobs = new Map();
     this.workerStats = new Map();
-    
+
     this.initializeWorkers();
     console.log(`🔧 Compiler pool initialized with ${poolSize} workers`);
   }
@@ -21,52 +25,53 @@ class CompilerPool {
   }
 
   createWorker(id) {
-    const worker = new Worker(path.join(__dirname, 'compilerWorker.js'));
-    
+    const worker = new Worker(path.join(__dirname, "compilerWorker.js"));
+
     worker.workerId = id;
     worker.isBusy = false;
     worker.jobCount = 0;
-    
+
     this.workerStats.set(id, { jobs: 0, errors: 0, avgTime: 0 });
-    
-    worker.on('message', (result) => {
+
+    worker.on("message", (result) => {
       const { jobId, success, data, error, processingTime } = result;
       const job = this.activeJobs.get(jobId);
-      
+
       if (job) {
         worker.isBusy = false;
         worker.jobCount++;
-        
+
         // Update stats
         const stats = this.workerStats.get(id);
         stats.jobs++;
         if (!success) stats.errors++;
-        stats.avgTime = ((stats.avgTime * (stats.jobs - 1)) + processingTime) / stats.jobs;
-        
+        stats.avgTime =
+          (stats.avgTime * (stats.jobs - 1) + processingTime) / stats.jobs;
+
         this.activeJobs.delete(jobId);
-        
+
         if (success) {
           job.resolve(data);
         } else {
           job.reject(new Error(error));
         }
-        
+
         this.processQueue();
       }
     });
-    
-    worker.on('error', (error) => {
+
+    worker.on("error", (error) => {
       console.error(`Worker ${id} error:`, error);
       this.restartWorker(id);
     });
-    
-    worker.on('exit', (code) => {
+
+    worker.on("exit", (code) => {
       if (code !== 0) {
         console.error(`Worker ${id} exited with code ${code}`);
         this.restartWorker(id);
       }
     });
-    
+
     this.workers[id] = worker;
   }
 
@@ -83,55 +88,75 @@ class CompilerPool {
   compile(qNum, code, studentName) {
     return new Promise((resolve, reject) => {
       const jobId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const job = { jobId, qNum, code, studentName, resolve, reject, timestamp: Date.now(), fullTests: true };
-      
+      const job = {
+        jobId,
+        qNum,
+        code,
+        studentName,
+        resolve,
+        reject,
+        timestamp: Date.now(),
+        fullTests: true,
+      };
+
       this.queue.push(job);
       this.processQueue();
-      
-      // Timeout after 30 seconds
+
+      // Timeout after configurable seconds (default 30s)
+      const jobTimeout = parseInt(process.env.JOB_TIMEOUT_MS || "30000", 10);
       setTimeout(() => {
         if (this.activeJobs.has(jobId)) {
           this.activeJobs.delete(jobId);
-          reject(new Error('Compilation timeout'));
+          reject(new Error("Compilation timeout"));
         }
-      }, 30000);
+      }, jobTimeout);
     });
   }
 
   compileWithLimitedTests(qNum, code, studentName) {
     return new Promise((resolve, reject) => {
       const jobId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const job = { jobId, qNum, code, studentName, resolve, reject, timestamp: Date.now(), fullTests: false };
-      
+      const job = {
+        jobId,
+        qNum,
+        code,
+        studentName,
+        resolve,
+        reject,
+        timestamp: Date.now(),
+        fullTests: false,
+      };
+
       this.queue.push(job);
       this.processQueue();
-      
-      // Timeout after 30 seconds
+
+      // Timeout after configurable seconds (default 30s)
+      const jobTimeout = parseInt(process.env.JOB_TIMEOUT_MS || "30000", 10);
       setTimeout(() => {
         if (this.activeJobs.has(jobId)) {
           this.activeJobs.delete(jobId);
-          reject(new Error('Compilation timeout'));
+          reject(new Error("Compilation timeout"));
         }
-      }, 30000);
+      }, jobTimeout);
     });
   }
 
   processQueue() {
     if (this.queue.length === 0) return;
-    
-    const availableWorker = this.workers.find(w => w && !w.isBusy);
+
+    const availableWorker = this.workers.find((w) => w && !w.isBusy);
     if (!availableWorker) return;
-    
+
     const job = this.queue.shift();
     availableWorker.isBusy = true;
     this.activeJobs.set(job.jobId, job);
-    
+
     availableWorker.postMessage({
       jobId: job.jobId,
       qNum: job.qNum,
       code: job.code,
       studentName: job.studentName,
-      fullTests: job.fullTests
+      fullTests: job.fullTests,
     });
   }
 
@@ -143,13 +168,13 @@ class CompilerPool {
       workers: Array.from(this.workerStats.entries()).map(([id, stats]) => ({
         id,
         busy: this.workers[id]?.isBusy || false,
-        ...stats
-      }))
+        ...stats,
+      })),
     };
   }
 
   shutdown() {
-    this.workers.forEach(worker => {
+    this.workers.forEach((worker) => {
       if (worker) worker.terminate();
     });
   }

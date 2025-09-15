@@ -1,8 +1,7 @@
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { TEST_CASES, MCQ_ANSWERS } = require("../config/constants");
-const { createFullCode, cleanupFiles, evaluateOutput } = require("../utils/codeUtils");
+// Test cases and utilities are defined locally in this file
 
 // Grading queue for load management
 const gradingQueue = [];
@@ -46,7 +45,7 @@ function autoGradeInternal(studentName, answers) {
     if (questions.length === 0) {
       return resolve({
         totalScore: 0,
-        maxScore: 100,
+        maxScore: 75,
         results: {},
         error: "No valid answers submitted",
       });
@@ -64,7 +63,7 @@ function autoGradeInternal(studentName, answers) {
         };
         completed++;
         if (completed === questions.length) {
-          resolve({ totalScore, maxScore: 100, results });
+          resolve({ totalScore, maxScore: 75, results });
         }
         return;
       }
@@ -97,7 +96,7 @@ function autoGradeInternal(studentName, answers) {
             if (completed === questions.length) {
               resolve({
                 totalScore,
-                maxScore: Math.max(maxScore, 100),
+                maxScore: 75,
                 results,
               });
             }
@@ -125,7 +124,7 @@ function autoGradeInternal(studentName, answers) {
               if (completed === questions.length) {
                 resolve({
                   totalScore,
-                  maxScore: Math.max(maxScore, 100),
+                  maxScore: 75,
                   results,
                 });
               }
@@ -141,7 +140,7 @@ function autoGradeInternal(studentName, answers) {
 
         completed++;
         if (completed === questions.length) {
-          resolve({ totalScore, maxScore: Math.max(maxScore, 100), results });
+          resolve({ totalScore, maxScore: 75, results });
         }
       }
     });
@@ -149,36 +148,8 @@ function autoGradeInternal(studentName, answers) {
 }
 
 function gradeMCQ(studentMCQAnswers) {
-  let mcqScore = 0;
-  let mcqMaxScore = 25;
-  let mcqResults = {};
-
-  for (let i = 1; i <= 5; i++) {
-    const questionKey = `mcq${i}`;
-    const studentAnswer = studentMCQAnswers ? studentMCQAnswers[questionKey] : null;
-    const correctAnswer = MCQ_ANSWERS[questionKey];
-
-    if (studentAnswer === correctAnswer) {
-      mcqScore += 5;
-      mcqResults[questionKey] = {
-        score: 5,
-        maxScore: 5,
-        studentAnswer,
-        correctAnswer,
-        status: "Correct",
-      };
-    } else {
-      mcqResults[questionKey] = {
-        score: 0,
-        maxScore: 5,
-        studentAnswer: studentAnswer || "Not answered",
-        correctAnswer,
-        status: "Incorrect",
-      };
-    }
-  }
-
-  return { mcqScore, mcqMaxScore, mcqResults };
+  // MCQ functionality removed - coding assessment only
+  return { mcqScore: 0, mcqMaxScore: 0, mcqResults: {} };
 }
 
 module.exports = {
