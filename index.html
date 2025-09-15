@@ -1309,7 +1309,7 @@
             <div class="stat-label">Questions</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number">100</div>
+            <div class="stat-number">75</div>
             <div class="stat-label">Total Points</div>
           </div>
           <div class="stat-item">
@@ -1326,35 +1326,35 @@
       <!-- Question 1 -->
       <div class="question-card">
         <div class="question-header">
-          <div class="question-title">1. In-place 2D Matrix Transpose</div>
+          <div class="question-title">1. Binary Search</div>
           <div class="question-meta">
-            <span class="difficulty-tag medium">Medium</span>
+            <span class="difficulty-tag easy">Easy</span>
             <div class="question-points">25 Points</div>
           </div>
         </div>
         <div class="question-tags">
           <span class="company-tag">Google</span>
           <span class="company-tag">Microsoft</span>
-          <span class="topic-tag">Matrix</span>
-          <span class="topic-tag">Two Pointers</span>
+          <span class="topic-tag">Binary Search</span>
+          <span class="topic-tag">Array</span>
         </div>
         <div class="question-content">
           <div class="problem-section">
             <div class="section-title">Problem Statement</div>
             <div class="question-text">
-              Given a square integer matrix of size N×N, transpose the matrix
-              in-place (do not use extra space). The transpose flips the matrix
-              over its main diagonal.
+              Given a sorted (increasing) array of integers nums and an integer
+              target, implement binary search to return the index of target in
+              nums. If target does not exist in nums, return -1.
             </div>
           </div>
 
           <div class="problem-section">
             <div class="section-title">Example</div>
             <div class="example-box">
-              <strong>Input:</strong> matrix = [[1,2,3],[4,5,6],[7,8,9]]<br />
-              <strong>Output:</strong> [[1,4,7],[2,5,8],[3,6,9]]<br />
-              <strong>Explanation:</strong> The matrix is transposed by swapping
-              elements across the main diagonal.
+              <strong>Input:</strong> nums = [1,3,5,7,9,12], target = 9<br />
+              <strong>Output:</strong> 4<br />
+              <strong>Explanation:</strong> The target 9 is found at index 4 in
+              the array.
             </div>
           </div>
 
@@ -1362,9 +1362,11 @@
             <div class="section-title">Constraints</div>
             <div class="constraints-list">
               <ul>
-                <li>1 ≤ N ≤ 300</li>
-                <li>-10<sup>9</sup> ≤ matrix[i][j] ≤ 10<sup>9</sup></li>
-                <li>Matrix must be modified in-place</li>
+                <li>1 ≤ nums.length ≤ 10<sup>4</sup></li>
+                <li>-10<sup>4</sup> ≤ nums[i], target ≤ 10<sup>4</sup></li>
+                <li>
+                  All elements in nums are unique and sorted in ascending order
+                </li>
               </ul>
             </div>
           </div>
@@ -1373,36 +1375,36 @@
             <div class="section-title">Sample Test Cases</div>
             <div class="test-cases">
               <div class="test-case">
-                <strong>Test 1:</strong> [[1,2],[3,4]] → [[1,3],[2,4]]
+                <strong>Test 1:</strong> nums = [1,3,5,7,9,12], target = 9 → 4
               </div>
               <div class="test-case">
-                <strong>Test 2:</strong> [[2]] → [[2]]
+                <strong>Test 2:</strong> nums = [2,4,6,8,10], target = 5 → -1
               </div>
               <div class="test-case">
-                <strong>Test 3:</strong> [[5,1,8],[4,7,2],[9,3,6]] →
-                [[5,4,9],[1,7,3],[8,2,6]]
+                <strong>Test 3:</strong> nums = [0,1,2,3,4,5], target = 0 → 0
               </div>
             </div>
           </div>
 
           <div class="code-signature">
-            void transposeMatrix(vector&lt;vector&lt;int&gt; &gt;&amp; matrix);
+            int binarySearch(const vector&lt;int&gt;&amp; nums, int target);
           </div>
           <div class="code-editor">
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button class="code-action-btn" onclick="resetCode(1)">
+                <button type="button" class="code-action-btn" onclick="resetCode(1); return false;">
                   Reset
                 </button>
-                <button class="code-action-btn" onclick="formatCode(1)">
+                <button type="button" class="code-action-btn" onclick="formatCode(1); return false;">
                   Format
                 </button>
               </div>
             </div>
             <textarea class="code-textarea" id="q1">
-void transposeMatrix(vector<vector<int> >& matrix) {
+int binarySearch(const vector<int>& nums, int target) {
     // Implement this function
+    return -1;
 }
 </textarea
             >
@@ -1426,34 +1428,34 @@ void transposeMatrix(vector<vector<int> >& matrix) {
       <!-- Question 2 -->
       <div class="question-card">
         <div class="question-header">
-          <div class="question-title">2. Merge Two Sorted Arrays</div>
+          <div class="question-title">2. Recursion: Sum of Array</div>
           <div class="question-meta">
-            <span class="difficulty-tag medium">Medium</span>
+            <span class="difficulty-tag easy">Easy</span>
             <div class="question-points">25 Points</div>
           </div>
         </div>
         <div class="question-tags">
           <span class="company-tag">Amazon</span>
           <span class="company-tag">Apple</span>
+          <span class="topic-tag">Recursion</span>
           <span class="topic-tag">Array</span>
-          <span class="topic-tag">Two Pointers</span>
         </div>
         <div class="question-content">
           <div class="problem-section">
             <div class="section-title">Problem Statement</div>
             <div class="question-text">
-              Given two sorted integer arrays arr1 and arr2, merge them and
-              return a single sorted array.
+              Given an array of integers nums, write a recursive function to
+              return the sum of all elements in the array. You must use
+              recursion - iterative solutions will not receive full credit.
             </div>
           </div>
 
           <div class="problem-section">
             <div class="section-title">Example</div>
             <div class="example-box">
-              <strong>Input:</strong> arr1 = [1,3,5], arr2 = [2,4,6]<br />
-              <strong>Output:</strong> [1,2,3,4,5,6]<br />
-              <strong>Explanation:</strong> Merge both arrays while maintaining
-              sorted order.
+              <strong>Input:</strong> nums = [1,2,3,4]<br />
+              <strong>Output:</strong> 10<br />
+              <strong>Explanation:</strong> 1 + 2 + 3 + 4 = 10
             </div>
           </div>
 
@@ -1461,9 +1463,9 @@ void transposeMatrix(vector<vector<int> >& matrix) {
             <div class="section-title">Constraints</div>
             <div class="constraints-list">
               <ul>
-                <li>0 ≤ arr1.length, arr2.length ≤ 5000</li>
-                <li>-10<sup>9</sup> ≤ arr1[i], arr2[j] ≤ 10<sup>9</sup></li>
-                <li>Both arrays are sorted in ascending order</li>
+                <li>0 ≤ nums.length ≤ 1000</li>
+                <li>-1000 ≤ nums[i] ≤ 1000</li>
+                <li>Must use recursive approach</li>
               </ul>
             </div>
           </div>
@@ -1472,38 +1474,34 @@ void transposeMatrix(vector<vector<int> >& matrix) {
             <div class="section-title">Sample Test Cases</div>
             <div class="test-cases">
               <div class="test-case">
-                <strong>Test 1:</strong> [1,2,3], [4,5,6] → [1,2,3,4,5,6]
+                <strong>Test 1:</strong> [1,2,3,4] → 10
               </div>
+              <div class="test-case"><strong>Test 2:</strong> [] → 0</div>
               <div class="test-case">
-                <strong>Test 2:</strong> [2,4,6], [] → [2,4,6]
-              </div>
-              <div class="test-case">
-                <strong>Test 3:</strong> [], [1,1,2] → [1,1,2]
+                <strong>Test 3:</strong> [100,200,300] → 600
               </div>
             </div>
           </div>
 
           <div class="code-signature">
-            vector&lt;int&gt; mergeSortedArrays(const vector&lt;int&gt;&amp;
-            arr1, const vector&lt;int&gt;&amp; arr2);
+            int recursiveArraySum(const vector&lt;int&gt;&amp; nums);
           </div>
           <div class="code-editor">
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button class="code-action-btn" onclick="resetCode(2)">
+                <button type="button" class="code-action-btn" onclick="resetCode(2); return false;">
                   Reset
                 </button>
-                <button class="code-action-btn" onclick="formatCode(2)">
+                <button type="button" class="code-action-btn" onclick="formatCode(2); return false;">
                   Format
                 </button>
               </div>
             </div>
             <textarea class="code-textarea" id="q2">
-vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) {
-    // Implement this function
-    vector<int> result;
-    return result;
+int recursiveArraySum(const vector<int>& nums) {
+    // Implement this function using recursion
+    return 0;
 }</textarea
             >
           </div>
@@ -1526,9 +1524,9 @@ vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) 
       <!-- Question 3 -->
       <div class="question-card">
         <div class="question-header">
-          <div class="question-title">3. Intersection of Two Arrays</div>
+          <div class="question-title">3. Two Pointers: Pair with Given Sum</div>
           <div class="question-meta">
-            <span class="difficulty-tag hard">Hard</span>
+            <span class="difficulty-tag medium">Medium</span>
             <div class="question-points">25 Points</div>
           </div>
         </div>
@@ -1536,24 +1534,24 @@ vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) 
           <span class="company-tag">Facebook</span>
           <span class="company-tag">Tesla</span>
           <span class="topic-tag">Array</span>
-          <span class="topic-tag">Hash Set</span>
+          <span class="topic-tag">Two Pointers</span>
         </div>
         <div class="question-content">
           <div class="problem-section">
             <div class="section-title">Problem Statement</div>
             <div class="question-text">
-              Given two integer arrays arr1 and arr2, return an array of their
-              intersection (unique elements present in both).
+              Given a sorted array of integers nums and an integer target,
+              return a pair of indices (0-based) of two numbers whose sum equals
+              target. If such a pair does not exist, return an empty vector.
             </div>
           </div>
 
           <div class="problem-section">
             <div class="section-title">Example</div>
             <div class="example-box">
-              <strong>Input:</strong> arr1 = [1,2,2,3], arr2 = [2,2,4]<br />
-              <strong>Output:</strong> [2]<br />
-              <strong>Explanation:</strong> Only 2 is present in both arrays
-              (unique intersection).
+              <strong>Input:</strong> nums = [1,2,4,7,11], target = 13<br />
+              <strong>Output:</strong> [1,4]<br />
+              <strong>Explanation:</strong> nums[1] + nums[4] = 2 + 11 = 13
             </div>
           </div>
 
@@ -1561,9 +1559,10 @@ vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) 
             <div class="section-title">Constraints</div>
             <div class="constraints-list">
               <ul>
-                <li>0 ≤ arr1.length, arr2.length ≤ 10<sup>5</sup></li>
-                <li>-10<sup>9</sup> ≤ arr1[i], arr2[j] ≤ 10<sup>9</sup></li>
-                <li>Return unique elements only</li>
+                <li>2 ≤ nums.length ≤ 3 × 10<sup>4</sup></li>
+                <li>-1000 ≤ nums[i] ≤ 1000</li>
+                <li>-1000 ≤ target ≤ 1000</li>
+                <li>Array is sorted in ascending order</li>
               </ul>
             </div>
           </div>
@@ -1572,36 +1571,37 @@ vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) 
             <div class="section-title">Sample Test Cases</div>
             <div class="test-cases">
               <div class="test-case">
-                <strong>Test 1:</strong> [1,2,3], [3,2,1] → [1,2,3]
+                <strong>Test 1:</strong> nums = [1,2,4,7,11], target = 13 →
+                [1,4]
               </div>
               <div class="test-case">
-                <strong>Test 2:</strong> [1,1,1,1], [1] → [1]
+                <strong>Test 2:</strong> nums = [1,2,3,4], target = 8 → []
               </div>
               <div class="test-case">
-                <strong>Test 3:</strong> [2,3,4], [5,6,7] → []
+                <strong>Test 3:</strong> nums = [-2,0,1,3,5], target = 3 → [0,4]
               </div>
             </div>
           </div>
 
           <div class="code-signature">
-            vector&lt;int&gt; arrayIntersection(const vector&lt;int&gt;&amp;
-            arr1, const vector&lt;int&gt;&amp; arr2);
+            vector&lt;int&gt; twoSumIndices(const vector&lt;int&gt;&amp; nums,
+            int target);
           </div>
           <div class="code-editor">
             <div class="code-editor-header">
               <span class="code-language">C++</span>
               <div class="code-actions">
-                <button class="code-action-btn" onclick="resetCode(3)">
+                <button type="button" class="code-action-btn" onclick="resetCode(3); return false;">
                   Reset
                 </button>
-                <button class="code-action-btn" onclick="formatCode(3)">
+                <button type="button" class="code-action-btn" onclick="formatCode(3); return false;">
                   Format
                 </button>
               </div>
             </div>
             <textarea class="code-textarea" id="q3">
-vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) {
-    // Implement this function
+vector<int> twoSumIndices(const vector<int>& nums, int target) {
+    // Implement this function using two pointers
     vector<int> result;
     return result;
 }</textarea
@@ -1705,9 +1705,9 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
       let isDeveloper = false; // Developer mode for testing
 
       const defaultTemplates = {
-        1: `void transposeMatrix(vector<vector<int> >& matrix) {\n    // Implement this function\n}`,
-        2: `vector<int> mergeSortedArrays(const vector<int>& arr1, const vector<int>& arr2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`,
-        3: `vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) {\n    // Implement this function\n    vector<int> result;\n    return result;\n}`,
+        1: `int binarySearch(const vector<int>& nums, int target) {\n    // Implement this function\n    return -1;\n}`,
+        2: `int recursiveArraySum(const vector<int>& nums) {\n    // Implement this function using recursion\n    return 0;\n}`,
+        3: `vector<int> twoSumIndices(const vector<int>& nums, int target) {\n    // Implement this function using two pointers\n    vector<int> result;\n    return result;\n}`,
       };
 
       // Richa's Special Features - Optimized
@@ -2153,7 +2153,7 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
                         <h3 style="margin-bottom: 1rem;">Your Previous Results</h3>
                         <p><strong>Score:</strong> ${
                           submission.totalScore || 0
-                        }/${submission.maxScore || 100} (${percentage}%)</p>
+                        }/${submission.maxScore || 75} (${percentage}%)</p>
                         <p><strong>Submitted:</strong> ${new Date(
                           submission.timestamp
                         ).toLocaleString()}</p>
@@ -2557,37 +2557,77 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
         const textarea = document.getElementById("q" + qNum);
         const defaultCode = defaultTemplates[qNum];
 
+        if (!textarea) {
+          showToast("error", "Error", "Code editor not found");
+          return;
+        }
+
+        if (!defaultCode) {
+          showToast("error", "Error", "Default template not available");
+          return;
+        }
+
+        // Check if current code is already the default
+        if (textarea.value.trim() === defaultCode.trim()) {
+          showToast(
+            "info",
+            "Already Reset",
+            "This question is already at default template"
+          );
+          return;
+        }
+
         if (
           confirm(
-            `Are you sure you want to reset Question ${qNum} to default template?`
+            `Are you sure you want to reset Question ${qNum} to default template?\n\nThis will remove all your current code.`
           )
         ) {
           textarea.value = defaultCode;
 
           // Update status
           const statusDot = document.getElementById("status" + qNum);
-          statusDot.className = "status-dot status-empty";
+          if (statusDot) {
+            statusDot.className = "status-dot status-empty";
+          }
 
-          // Remove from answers
+          // Remove from answers and update localStorage
           delete answers[qNum];
-          localStorage.setItem(
-            `${studentName}_answers`,
-            JSON.stringify(answers)
-          );
+          if (window.studentName) {
+            localStorage.setItem(
+              `${window.studentName}_answers`,
+              JSON.stringify(answers)
+            );
+          }
+
+          // Update question status and counts
+          updateQuestionStatus(qNum);
+          updateCompletedCount();
 
           showToast(
-            "info",
+            "success",
             "Code Reset",
             `Question ${qNum} reset to default template`
           );
+
+          // Focus back to textarea for immediate typing
+          textarea.focus();
         }
       }
 
       function formatCode(qNum) {
         const textarea = document.getElementById("q" + qNum);
-        const code = textarea.value.trim();
 
-        if (!code || code === defaultTemplates[qNum].trim()) {
+        if (!textarea) {
+          showToast("error", "Error", "Code editor not found");
+          return;
+        }
+
+        const code = textarea.value.trim();
+        const defaultCode = defaultTemplates[qNum]
+          ? defaultTemplates[qNum].trim()
+          : "";
+
+        if (!code) {
           showToast(
             "warning",
             "Nothing to Format",
@@ -2596,10 +2636,57 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
           return;
         }
 
-        const formattedCode = formatCppCode(code);
-        textarea.value = formattedCode;
+        if (code === defaultCode) {
+          showToast(
+            "info",
+            "Default Template",
+            "Please modify the template before formatting"
+          );
+          return;
+        }
 
-        showToast("success", "Code Formatted", "Code formatting applied");
+        try {
+          const formattedCode = formatCppCode(code);
+
+          if (formattedCode === code) {
+            showToast(
+              "info",
+              "Already Formatted",
+              "Your code is already well-formatted"
+            );
+            return;
+          }
+
+          textarea.value = formattedCode;
+
+          // Update answers if code was modified
+          answers[qNum] = formattedCode;
+          if (window.studentName) {
+            localStorage.setItem(
+              `${window.studentName}_answers`,
+              JSON.stringify(answers)
+            );
+          }
+
+          // Update status to show modification
+          updateQuestionStatus(qNum);
+
+          showToast(
+            "success",
+            "Code Formatted",
+            "Your code has been formatted with proper indentation and spacing"
+          );
+
+          // Focus back to textarea
+          textarea.focus();
+        } catch (error) {
+          console.error("Formatting error:", error);
+          showToast(
+            "error",
+            "Format Error",
+            "Could not format code. Please check for syntax issues."
+          );
+        }
       }
 
       function clearLocalExamData() {
@@ -2746,75 +2833,143 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
       function formatCppCode(code) {
         if (!code || code.trim() === "") return code;
 
-        let lines = code.split("\n");
-        let formatted = [];
-        let indentLevel = 0;
-        const indentSize = 4;
+        try {
+          let lines = code.split("\n");
+          let formatted = [];
+          let indentLevel = 0;
+          const indentSize = 4;
 
-        for (let i = 0; i < lines.length; i++) {
-          let line = lines[i].trim();
-          if (line === "") {
-            formatted.push("");
-            continue;
+          for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+
+            // Handle empty lines - preserve single empty lines
+            if (line === "") {
+              // Only add empty line if previous line wasn't empty
+              if (formatted.length > 0 && formatted[formatted.length - 1] !== "") {
+                formatted.push("");
+              }
+              continue;
+            }
+
+            // Handle comments - preserve them but add proper indentation
+            if (line.startsWith("//") || line.startsWith("/*")) {
+              let indent = " ".repeat(indentLevel * indentSize);
+              formatted.push(indent + line);
+              continue;
+            }
+
+            // Decrease indent for closing braces
+            if (line.startsWith("}")) {
+              indentLevel = Math.max(0, indentLevel - 1);
+            }
+
+            // Special handling for preprocessor directives
+            if (line.startsWith("#")) {
+              formatted.push(line); // No indentation for preprocessor
+              continue;
+            }
+
+            // Add proper indentation
+            let indent = " ".repeat(indentLevel * indentSize);
+
+            // Format specific C++ constructs
+            line = formatCppLine(line);
+
+            formatted.push(indent + line);
+
+            // Increase indent after opening braces
+            if (line.endsWith("{")) {
+              indentLevel++;
+            }
           }
 
-          // Decrease indent for closing braces
-          if (line.startsWith("}")) {
-            indentLevel = Math.max(0, indentLevel - 1);
-          }
-
-          // Add proper indentation
-          let indent = " ".repeat(indentLevel * indentSize);
-
-          // Format specific C++ constructs
-          line = formatCppLine(line);
-
-          formatted.push(indent + line);
-
-          // Increase indent after opening braces
-          if (line.endsWith("{")) {
-            indentLevel++;
-          }
+          // Clean up excessive blank lines
+          let result = formatted.join("\n");
+          result = result.replace(/\n\s*\n\s*\n+/g, "\n\n");
+          
+          return result;
+        } catch (error) {
+          console.error("Error in formatCppCode:", error);
+          return code;
         }
-
-        return formatted.join("\n");
       }
 
       function formatCppLine(line) {
-        // Add space after keywords
-        line = line.replace(/\b(if|for|while|switch)\s*\(/g, "$1 (");
+        // Don't format if line is a string literal or comment
+        if (line.includes('"') && line.match(/"[^"]*"/)) {
+          return line;
+        }
 
-        // Add spaces around compound operators
-        line = line.replace(/(\w)\s*\+=\s*(\w)/g, "$1 += $2");
-        line = line.replace(/(\w)\s*-=\s*(\w)/g, "$1 -= $2");
-        line = line.replace(/(\w)\s*\*=\s*(\w)/g, "$1 *= $2");
-        line = line.replace(/(\w)\s*\/=\s*(\w)/g, "$1 /= $2");
-        line = line.replace(/(\w)\s*%=\s*(\w)/g, "$1 %= $2");
+        try {
+          // Variable declarations with proper spacing
+          line = line.replace(/\b(int|string|vector|bool|char|double|float)\s+/g, "$1 ");
+          
+          // Control flow keywords with space before parentheses
+          line = line.replace(/\b(if|for|while|switch)\s*\(/g, "$1 (");
+          
+          // Function calls - no space before parentheses for function names
+          line = line.replace(/\b(\w+)\s*\(/g, (match, funcName) => {
+            // Keywords that should have space
+            const keywords = ['if', 'for', 'while', 'switch', 'catch'];
+            if (keywords.includes(funcName)) {
+              return funcName + ' (';
+            }
+            return funcName + '(';
+          });
 
-        // Add spaces around single = but NOT compound operators
-        line = line.replace(/([^+\-*\/!<>=])=([^=])/g, "$1 = $2");
+          // Assignment operators with spaces
+          line = line.replace(/([^+\-*\/!<>=])\s*=\s*([^=])/g, "$1 = $2");
+          line = line.replace(/(\w)\s*\+=\s*/g, "$1 += ");
+          line = line.replace(/(\w)\s*-=\s*/g, "$1 -= ");
+          line = line.replace(/(\w)\s*\*=\s*/g, "$1 *= ");
+          line = line.replace(/(\w)\s*\/=\s*/g, "$1 /= ");
 
-        // Add spaces around comparison operators
-        line = line.replace(/([^=!<>])==([^=])/g, "$1 == $2");
-        line = line.replace(/([^=!<>])!=([^=])/g, "$1 != $2");
-        line = line.replace(/([^<])<=([^=])/g, "$1 <= $2");
-        line = line.replace(/([^>])>=([^=])/g, "$1 >= $2");
-        line = line.replace(/([^<>])<([^<=])/g, "$1 < $2");
-        line = line.replace(/([^<>])>([^>=])/g, "$1 > $2");
+          // Comparison operators with spaces
+          line = line.replace(/([^=!<>])\s*==\s*/g, "$1 == ");
+          line = line.replace(/([^=!<>])\s*!=\s*/g, "$1 != ");
+          line = line.replace(/([^<])\s*<=\s*/g, "$1 <= ");
+          line = line.replace(/([^>])\s*>=\s*/g, "$1 >= ");
+          line = line.replace(/([^<>])\s*<\s*([^<=])/g, "$1 < $2");
+          line = line.replace(/([^<>])\s*>\s*([^>=])/g, "$1 > $2");
 
-        // Add space after commas
-        line = line.replace(/,([^\s])/g, ", $1");
+          // Logical operators with spaces
+          line = line.replace(/([^&])\s*&&\s*/g, "$1 && ");
+          line = line.replace(/([^|])\s*\|\|\s*/g, "$1 || ");
 
-        // Add space after semicolons in for loops
-        line = line.replace(/;([^\s])/g, "; $1");
+          // Arithmetic operators with spaces
+          line = line.replace(/([^+])\s*\+\s*([^+=])/g, "$1 + $2");
+          line = line.replace(/([^-])\s*-\s*([^-=])/g, "$1 - $2");
+          line = line.replace(/([^*])\s*\*\s*([^*=])/g, "$1 * $2");
+          line = line.replace(/([^/])\s*\/\s*([^/=])/g, "$1 / $2");
 
-        // Format function declarations
-        line = line.replace(/\)\s*\{/g, ") {");
+          // Comma spacing
+          line = line.replace(/,([^\s])/g, ", $1");
+          line = line.replace(/\s+,/g, ",");
 
-        // Clean up multiple spaces
-        line = line.replace(/\s+/g, " ");
+          // Semicolon spacing (for loops)
+          line = line.replace(/;([^\s])/g, "; $1");
+          line = line.replace(/\s+;/g, ";");
 
-        return line;
+          // Brace spacing
+          line = line.replace(/\)\s*\{/g, ") {");
+          line = line.replace(/\belse\s*\{/g, "else {");
+
+          // Array/vector access - no spaces inside brackets
+          line = line.replace(/\[\s+/g, "[");
+          line = line.replace(/\s+\]/g, "]");
+
+          // Template brackets - no spaces inside
+          line = line.replace(/<\s+/g, "<");
+          line = line.replace(/\s+>/g, ">");
+
+          // Clean up multiple spaces
+          line = line.replace(/\s{2,}/g, " ");
+
+          return line.trim();
+        } catch (error) {
+          console.error("Error in formatCppLine:", error);
+          return line;
+        }
       }
 
       function clearAnswer(qNum) {
@@ -3128,7 +3283,7 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
                             <h3 style="margin-bottom: 1rem;">Your Results</h3>
                             <p><strong>Score:</strong> ${
                               data.totalScore || 0
-                            }/${data.maxScore || 100} (${percentage}%)</p>
+                            }/${data.maxScore || 75} (${percentage}%)</p>
                             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                         </div>
                         <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>
@@ -3155,7 +3310,7 @@ vector<int> arrayIntersection(const vector<int>& arr1, const vector<int>& arr2) 
                             <h3 style="margin-bottom: 1rem;">Your Results</h3>
                             <p><strong>Score:</strong> ${
                               data.totalScore || 0
-                            }/${data.maxScore || 100} (${percentage}%)</p>
+                            }/${data.maxScore || 75} (${percentage}%)</p>
                             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                         </div>
                         <p style="opacity: 0.8; margin-top: 1rem;">This window will close automatically in 5 seconds...</p>

@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "Automated Coding Assessment Platform with real-time grading and load balancing",
   "main": "server.js",
-  "keywords": ["coding", "assessment", "grading", "c++", "exam", "education", "load-balancing"],
+  "keywords": [
+    "coding",
+    "assessment",
+    "grading",
+    "c++",
+    "exam",
+    "education",
+    "load-balancing"
+  ],
   "author": "Atul Gupta <theatulgupta@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -11,7 +19,7 @@
     "url": "https://github.com/theatulgupta/CodeAssess.git"
   },
   "scripts": {
-    "dev": "nodemon server.js",
+    "dev": "node server.js",
     "start": "node server.js",
     "clear-db": "node scripts/clear-database.js",
     "db-status": "node scripts/database-status.js",
@@ -22,6 +30,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "lowdb": "^1.0.0",
+    "node-fetch": "^2.7.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

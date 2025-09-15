@@ -30,21 +30,49 @@ if (cluster.isMaster && process.env.NODE_ENV === "production") {
 }
 
 // --- High-Load Optimized Middleware ---
+const GLOBAL_LIMIT_WINDOW_MS = parseInt(
+  process.env.GLOBAL_LIMIT_WINDOW_MS || `${5 * 60 * 1000}`,
+  10
+);
+const GLOBAL_LIMIT = parseInt(process.env.GLOBAL_LIMIT || "1000", 10);
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 1000, // Increased for exam load
+  windowMs: GLOBAL_LIMIT_WINDOW_MS,
+  limit: GLOBAL_LIMIT,
   message: "Too many requests, please wait",
   standardHeaders: false,
   legacyHeaders: false,
 });
 
-// Submission-specific rate limiter - increased for load balancing
+// Submission-specific rate limiter - tolerant for exam bursts
+const SUBMISSION_LIMIT_WINDOW_MS = parseInt(
+  process.env.SUBMISSION_LIMIT_WINDOW_MS || "60000",
+  10
+);
+const SUBMISSION_LIMIT = parseInt(process.env.SUBMISSION_LIMIT || "1000", 10);
+const DISABLE_SUBMISSION_LIMIT = /^true$/i.test(
+  process.env.DISABLE_SUBMISSION_LIMIT || "false"
+);
 const submissionLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 5, // Increased limit with load balancing
+  windowMs: SUBMISSION_LIMIT_WINDOW_MS,
+  limit: SUBMISSION_LIMIT,
+  keyGenerator: (req) =>
+    (req.body && req.body.rollNumber) || req.headers["x-roll-number"] || req.ip,
+  skipFailedRequests: true, // don't count 4xx/5xx (e.g., duplicate) towards the limit
   message: { error: "Too many submission attempts" },
   standardHeaders: false,
   legacyHeaders: false,
+});
+// Allow disabling submission rate limit via env for controlled windows
+const maybeSubmissionLimiter = DISABLE_SUBMISSION_LIMIT
+  ? (req, res, next) => next()
+  : submissionLimiter;
+
+// --- Crash Guards ---
+process.on("uncaughtException", (err) => {
+  console.error("💥 Uncaught Exception:", err.stack || err.message);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("💥 Unhandled Promise Rejection:", reason);
 });
 
 // Initialize compiler pool
@@ -56,6 +84,14 @@ if (!cluster.isMaster || process.env.NODE_ENV !== "production") {
 app.use(limiter);
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+
+// Handle malformed JSON bodies gracefully
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && "body" in err) {
+    return res.status(400).json({ error: "Invalid JSON payload" });
+  }
+  next(err);
+});
 
 // Performance optimizations
 app.set("trust proxy", 1);
@@ -103,7 +139,7 @@ const STUDENT_DATABASE = {
   "25MCSA10": "RUBIN JAIN",
   "25MCSA11": "BHUSHAN NARESH GATHIBANDHE",
   "25MCSA12": "LALIT KUMAR",
-  "25MCSA13": "DEVESH KUMAR VERMA",
+  "25MonCSA13": "DEVESH KUMAR VERMA",
   "25MCSA14": "SURYANSH JAISWAL",
   "25MCSA15": "POOJA PATIDAR",
   "25MCSA16": "MAYANK RAJ",
@@ -145,8 +181,9 @@ app.use((req, res, next) => {
 // --- Directory Setup ---
 const submissionDir = "submissions";
 try {
-  if (!fs.existsSync(submissionDir)) fs.mkdirSync(submissionDir);
-  if (!fs.existsSync("db")) fs.mkdirSync("db");
+  if (!fs.existsSync(submissionDir))
+    fs.mkdirSync(submissionDir, { recursive: true });
+  if (!fs.existsSync("db")) fs.mkdirSync("db", { recursive: true });
 } catch (error) {
   // Directory might already exist, ignore the error
 }
@@ -205,7 +242,7 @@ async function autoGrade(studentName, answers) {
 // --- API Endpoints ---
 
 // Submit answers endpoint
-app.post("/api/submit", submissionLimiter, async (req, res) => {
+app.post("/api/submit", maybeSubmissionLimiter, async (req, res) => {
   const startTime = Date.now();
   const {
     name,
@@ -241,13 +278,17 @@ app.post("/api/submit", submissionLimiter, async (req, res) => {
     }
 
     // Grade coding questions with optimized timeout
+    const GRADE_TIMEOUT_MS = parseInt(
+      process.env.GRADE_TIMEOUT_MS || "30000",
+      10
+    );
     const codingResult = answers
       ? await Promise.race([
           autoGrade(name, answers),
           new Promise((_, reject) =>
             setTimeout(
               () => reject(new Error("Server busy, please retry")),
-              30000
+              GRADE_TIMEOUT_MS
             )
           ),
         ])
@@ -371,7 +412,7 @@ app.post(
   "/api/test-code",
   rateLimit({
     windowMs: 60 * 1000,
-    max: 20, // Reasonable limit for exam use
+    limit: 200, // Increased headroom for concurrent testing
     message: { error: "Too many test runs" },
   }),
   async (req, res) => {
@@ -394,12 +435,38 @@ app.post(
   }
 );
 
+// Global error handler to avoid crashes and return structured errors
+app.use((err, req, res, next) => {
+  console.error("💥 Express error:", err.stack || err.message || err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).json({ error: "Internal server error" });
+});
+
 // Compiler pool status endpoint
 app.get("/api/compiler-status", (req, res) => {
   if (!compilerPool) {
     return res.json({ error: "Compiler pool not available" });
   }
   res.json(compilerPool.getStats());
+});
+
+// Health endpoint for monitoring
+app.get("/api/health", (req, res) => {
+  const mem = process.memoryUsage();
+  res.json({
+    status: "ok",
+    uptimeSec: Math.round(process.uptime()),
+    memory: {
+      rss: mem.rss,
+      heapTotal: mem.heapTotal,
+      heapUsed: mem.heapUsed,
+      external: mem.external,
+    },
+    compilerPool: compilerPool ? compilerPool.getStats() : null,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Admin endpoint to clear all results (use with caution!)
@@ -476,13 +543,19 @@ async function startServer() {
       }
     });
 
-    // Optimize server settings for high load
-    server.keepAliveTimeout = 65000;
-    server.headersTimeout = 66000;
-    server.maxConnections = 1000;
+    // Optimize server settings for high load (parameterized with env)
+    server.keepAliveTimeout = parseInt(
+      process.env.KEEP_ALIVE_TIMEOUT || "65000",
+      10
+    );
+    server.headersTimeout = parseInt(
+      process.env.HEADERS_TIMEOUT || "66000",
+      10
+    );
+    server.maxConnections = parseInt(process.env.MAX_CONNECTIONS || "1000", 10);
 
     // Graceful shutdown
-    process.on("SIGTERM", () => {
+    const shutdown = () => {
       console.log("🔄 Graceful shutdown initiated...");
       if (compilerPool) {
         compilerPool.shutdown();
@@ -491,7 +564,9 @@ async function startServer() {
         console.log("✅ Server closed");
         process.exit(0);
       });
-    });
+    };
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
   } catch (error) {
     console.error("❌ Failed to connect to database:", error.message);
     process.exit(1);
