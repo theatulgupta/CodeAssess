@@ -14,101 +14,82 @@ if (!fs.existsSync(submissionDir)) {
 const testCases = {
   1: [
     {
-      input: [
-        [1, 2],
-        [3, 4],
-      ],
-      expected: "[[1,3],[2,4]]",
-      points: 5,
-    },
-    { input: [[2]], expected: "[[2]]", points: 5 },
-    {
-      input: [
-        [5, 1, 8],
-        [4, 7, 2],
-        [9, 3, 6],
-      ],
-      expected: "[[5,4,9],[1,7,3],[8,2,6]]",
+      input: [[1, 3, 5, 7, 9, 12], 9],
+      expected: "4",
       points: 5,
     },
     {
-      input: [
-        [0, 0, 0],
-        [1, 1, 1],
-        [2, 2, 2],
-      ],
-      expected: "[[0,1,2],[0,1,2],[0,1,2]]",
+      input: [[2, 4, 6, 8, 10], 5],
+      expected: "-1",
       points: 5,
     },
     {
-      input: [
-        [-2, 3],
-        [7, -1],
-      ],
-      expected: "[[-2,7],[3,-1]]",
+      input: [[0, 1, 2, 3, 4, 5], 0],
+      expected: "0",
+      points: 5,
+    },
+    {
+      input: [[-5, -3, -1, 0, 2], -1],
+      expected: "2",
+      points: 5,
+    },
+    {
+      input: [[100], 100],
+      expected: "0",
       points: 5,
     },
   ],
   2: [
     {
-      input: [
-        [1, 2, 3],
-        [4, 5, 6],
-      ],
-      expected: "[1,2,3,4,5,6]",
-      points: 5,
-    },
-    { input: [[2, 4, 6], []], expected: "[2,4,6]", points: 5 },
-    { input: [[], [1, 1, 2]], expected: "[1,1,2]", points: 5 },
-    {
-      input: [
-        [1, 2, 3],
-        [1, 2, 3],
-      ],
-      expected: "[1,1,2,2,3,3]",
+      input: [[1, 2, 3, 4]],
+      expected: "10",
       points: 5,
     },
     {
-      input: [
-        [0, 5, 7],
-        [3, 8, 10],
-      ],
-      expected: "[0,3,5,7,8,10]",
+      input: [[]],
+      expected: "0",
+      points: 5,
+    },
+    {
+      input: [[100, 200, 300]],
+      expected: "600",
+      points: 5,
+    },
+    {
+      input: [[-5, 5]],
+      expected: "0",
+      points: 5,
+    },
+    {
+      input: [[1]],
+      expected: "1",
       points: 5,
     },
   ],
   3: [
     {
-      input: [
-        [1, 2, 3],
-        [3, 2, 1],
-      ],
-      expected: "[1,2,3]",
+      input: [[1, 2, 4, 7, 11], 13],
+      expected: "[1,4]",
       points: 5,
     },
-    { input: [[1, 1, 1, 1], [1]], expected: "[1]", points: 5 },
     {
-      input: [
-        [2, 3, 4],
-        [5, 6, 7],
-      ],
+      input: [[1, 2, 3, 4], 8],
       expected: "[]",
       points: 5,
     },
     {
-      input: [
-        [0, 5, 7, 5],
-        [5, 10, 0],
-      ],
-      expected: "[0,5]",
+      input: [[-2, 0, 1, 3, 5], 3],
+      expected: "[0,4]",
       points: 5,
     },
     {
-      input: [
-        [1, 2, 3, 4],
-        [2, 4, 6, 4],
-      ],
-      expected: "[2,4]",
+      input: [[0, 1, 2, 3, 4, 5], 6],
+      expected: "[1,5]",
+      points: 5,
+    },
+    {
+      input: [[10, 12, 14, 16, 18], 22],
+      expected: "[0,3]",
       points: 5,
     },
   ],
@@ -124,22 +105,8 @@ function createFullCode(qNum, studentCode) {
   const headers = `#include <iostream>
 #include <vector>
 #include <algorithm>
-#include <unordered_set>
+#include <cassert>
 using namespace std;
-
-void printMatrix(const vector<vector<int>>& matrix) {
-    cout << "[";
-    for (int i = 0; i < matrix.size(); i++) {
-        cout << "[";
-        for (int j = 0; j < matrix[i].size(); j++) {
-            cout << matrix[i][j];
-            if (j < matrix[i].size() - 1) cout << ",";
-        }
-        cout << "]";
-        if (i < matrix.size() - 1) cout << ",";
-    }
-    cout << "]";
-}
 
 void printArray(const vector<int>& arr) {
     cout << "[";
@@ -153,96 +120,81 @@ void printArray(const vector<int>& arr) {
   let mainFn = "";
   if (qNum === 1) {
     mainFn = `int main() {
-    vector<vector<int>> t1 = {{1,2},{3,4}};
-    transposeMatrix(t1);
-    printMatrix(t1);
-    cout << endl;
+    // Test Case 1: Binary Search
+    vector<int> nums1 = {1,3,5,7,9,12};
+    cout << binarySearch(nums1, 9) << endl;
     
-    vector<vector<int>> t2 = {{2}};
-    transposeMatrix(t2);
-    printMatrix(t2);
-    cout << endl;
+    // Test Case 2: Binary Search
+    vector<int> nums2 = {2,4,6,8,10};
+    cout << binarySearch(nums2, 5) << endl;
     
-    vector<vector<int>> t3 = {{5,1,8},{4,7,2},{9,3,6}};
-    transposeMatrix(t3);
-    printMatrix(t3);
-    cout << endl;
+    // Test Case 3: Binary Search
+    vector<int> nums3 = {0,1,2,3,4,5};
+    cout << binarySearch(nums3, 0) << endl;
     
-    vector<vector<int>> t4 = {{0,0,0},{1,1,1},{2,2,2}};
-    transposeMatrix(t4);
-    printMatrix(t4);
-    cout << endl;
+    // Test Case 4: Binary Search
+    vector<int> nums4 = {-5,-3,-1,0,2};
+    cout << binarySearch(nums4, -1) << endl;
     
-    vector<vector<int>> t5 = {{-2,3},{7,-1}};
-    transposeMatrix(t5);
-    printMatrix(t5);
-    cout << endl;
+    // Test Case 5: Binary Search
+    vector<int> nums5 = {100};
+    cout << binarySearch(nums5, 100) << endl;
     
     return 0;
 }`;
   } else if (qNum === 2) {
     mainFn = `int main() {
-    vector<int> arr1_1 = {1,2,3};
-    vector<int> arr2_1 = {4,5,6};
-    printArray(mergeSortedArrays(arr1_1, arr2_1));
-    cout << endl;
+    // Test Case 1: Recursive Array Sum
+    vector<int> nums1 = {1,2,3,4};
+    cout << recursiveArraySum(nums1) << endl;
     
-    vector<int> arr1_2 = {2,4,6};
-    vector<int> arr2_2 = {};
-    printArray(mergeSortedArrays(arr1_2, arr2_2));
-    cout << endl;
+    // Test Case 2: Recursive Array Sum
+    vector<int> nums2 = {};
+    cout << recursiveArraySum(nums2) << endl;
     
-    vector<int> arr1_3 = {};
-    vector<int> arr2_3 = {1,1,2};
-    printArray(mergeSortedArrays(arr1_3, arr2_3));
-    cout << endl;
+    // Test Case 3: Recursive Array Sum
+    vector<int> nums3 = {100,200,300};
+    cout << recursiveArraySum(nums3) << endl;
     
-    vector<int> arr1_4 = {1,2,3};
-    vector<int> arr2_4 = {1,2,3};
-    printArray(mergeSortedArrays(arr1_4, arr2_4));
-    cout << endl;
+    // Test Case 4: Recursive Array Sum
+    vector<int> nums4 = {-5,5};
+    cout << recursiveArraySum(nums4) << endl;
     
-    vector<int> arr1_5 = {0,5,7};
-    vector<int> arr2_5 = {3,8,10};
-    printArray(mergeSortedArrays(arr1_5, arr2_5));
-    cout << endl;
+    // Test Case 5: Recursive Array Sum
+    vector<int> nums5 = {1};
+    cout << recursiveArraySum(nums5) << endl;
     
     return 0;
 }`;
   } else if (qNum === 3) {
     mainFn = `int main() {
-    vector<int> arr1_1 = {1,2,3};
-    vector<int> arr2_1 = {3,2,1};
-    vector<int> result1 = arrayIntersection(arr1_1, arr2_1);
-    sort(result1.begin(), result1.end());
+    // Test Case 1: Two Sum Indices
+    vector<int> nums1 = {1,2,4,7,11};
+    vector<int> result1 = twoSumIndices(nums1, 13);
     printArray(result1);
     cout << endl;
     
-    vector<int> arr1_2 = {1,1,1,1};
-    vector<int> arr2_2 = {1};
-    vector<int> result2 = arrayIntersection(arr1_2, arr2_2);
-    sort(result2.begin(), result2.end());
+    // Test Case 2: Two Sum Indices
+    vector<int> nums2 = {1,2,3,4};
+    vector<int> result2 = twoSumIndices(nums2, 8);
     printArray(result2);
     cout << endl;
     
-    vector<int> arr1_3 = {2,3,4};
-    vector<int> arr2_3 = {5,6,7};
-    vector<int> result3 = arrayIntersection(arr1_3, arr2_3);
-    sort(result3.begin(), result3.end());
+    // Test Case 3: Two Sum Indices
+    vector<int> nums3 = {-2,0,1,3,5};
+    vector<int> result3 = twoSumIndices(nums3, 3);
     printArray(result3);
     cout << endl;
     
-    vector<int> arr1_4 = {0,5,7,5};
-    vector<int> arr2_4 = {5,10,0};
-    vector<int> result4 = arrayIntersection(arr1_4, arr2_4);
-    sort(result4.begin(), result4.end());
+    // Test Case 4: Two Sum Indices
+    vector<int> nums4 = {0,1,2,3,4,5};
+    vector<int> result4 = twoSumIndices(nums4, 6);
     printArray(result4);
     cout << endl;
     
-    vector<int> arr1_5 = {1,2,3,4};
-    vector<int> arr2_5 = {2,4,6,4};
-    vector<int> result5 = arrayIntersection(arr1_5, arr2_5);
-    sort(result5.begin(), result5.end());
+    // Test Case 5: Two Sum Indices
+    vector<int> nums5 = {10,12,14,16,18};
+    vector<int> result5 = twoSumIndices(nums5, 22);
     printArray(result5);
     cout << endl;
     
